@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retirement Strategy Lab | Multi-Asset Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:wght@400;500;700&family=DM+Mono&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --ink: #1A1F2E; --ink2: #2D3348; --ink3: #3D4560;
+            --mist: #F5F3EF; --mist2: #EDE9E2; --mist3: #E0DAD0;
+            --gold: #B8922A; --goldbg: rgba(184,146,42,0.08); --goldbdr: rgba(184,146,42,0.22);
+            --slate: #3A5B7A; --slatebg: rgba(58,91,122,0.08); --slateddr: rgba(58,91,122,0.22);
+            --plum: #6B4580; --plumbg: rgba(107,69,128,0.08); --plumbdr: rgba(107,69,128,0.22);
+            --rose: #A04040; --rosebg: rgba(160,64,64,0.08); --rosebdr: rgba(160,64,64,0.22);
+            --teal: #2D7070; --tealbg: #E6F2F2; --tealbdr: #B2D8D8;
+            --amber: #C47820; --amberbg: rgba(196,120,32,0.08); --amberbdr: rgba(196,120,32,0.22);
+            --err: #C0392B; --ok: #27AE60; --warn: #E67E22;
+            --border: rgba(0,0,0,0.08); --shadow: 0 4px 16px rgba(0,0,0,0.06); --r: 8px; --r2: 12px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--mist); font-family: 'DM Sans', sans-serif; color: var(--ink); line-height: 1.5; font-size: 13px; }
+
+        .hdr { background: var(--ink); border-bottom: 3px solid var(--gold); padding: 16px 28px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; color: #fff; }
+        .hdr-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 600; }
+        .hdr-sub { font-size: 11px; color: rgba(255,255,255,0.5); text-transform: uppercase; letter-spacing: 1px; }
+
+        .main { max-width: 1500px; margin: 0 auto; padding: 24px; display: grid; grid-template-columns: 350px 1fr; gap: 24px; align-items: start; }
+
+        .panel { background: #fff; border: 1px solid var(--border); border-radius: var(--r2); box-shadow: var(--shadow); margin-bottom: 16px; overflow: hidden; }
+        .panel-hd { padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--mist); display: flex; align-items: center; gap: 8px; font-weight: 700; }
+        .panel-bd { padding: 16px; }
+
+        .src { border-radius: var(--r); padding: 12px; margin-bottom: 12px; border: 1.5px solid; }
+        .src-title { font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+        .fld { margin-bottom: 8px; }
+        .fld label { display: block; font-size: 11px; font-weight: 600; color: var(--ink3); margin-bottom: 3px; }
+        input[type=number] { width: 100%; padding: 8px; border: 1px solid var(--mist3); border-radius: 4px; font-family: 'DM Mono'; font-size: 12px; outline: none; }
+        
+        .wrap { position: relative; }
+        .pre { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 11px; color: var(--ink3); }
+        .suf { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--ink3); }
+        .fld-pre input { padding-left: 20px; }
+        .fld-suf input { padding-right: 24px; }
+
+        .btn { width: 100%; padding: 12px; background: var(--ink); color: #fff; border: none; border-radius: var(--r); font-weight: 700; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn:hover { background: var(--gold); color: var(--ink); }
+        .btn-sec { background: var(--mist3); color: var(--ink); margin-top: 8px; width: auto; padding: 6px 16px; font-size: 11px; }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .kpi-card { background: #fff; border: 1.5px solid var(--border); border-radius: var(--r2); padding: 16px; }
+        .kpi-label { font-size: 10px; text-transform: uppercase; font-weight: 700; color: var(--ink3); margin-bottom: 4px; }
+        .kpi-val { font-family: 'DM Mono'; font-size: 20px; font-weight: 700; }
+        
+        .tbl-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--r); }
+        table { width: 100%; border-collapse: collapse; font-size: 11px; }
+        th { background: var(--ink); color: #fff; padding: 12px; text-align: right; position: sticky; top: 0; }
+        td { padding: 10px; border-bottom: 1px solid var(--mist2); text-align: right; font-family: 'DM Mono'; }
+
+        .insight { background: var(--goldbg); border: 1px solid var(--goldbdr); padding: 16px; border-radius: var(--r); line-height: 1.6; margin-bottom: 20px; }
+
+        @media print {
+            aside, .hdr, .btn, .btn-sec { display: none !important; }
+            .main { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header class="hdr">
+    <div>
+        <div class="hdr-title">Retirement Strategy Lab</div>
+        <div class="hdr-sub">Multi-Asset Drawdown & Tax Analysis</div>
+    </div>
+</header>
+
+<div class="main">
+    <aside>
+        <div class="panel">
+            <div class="panel-hd">Portfolio Assets</div>
+            <div class="panel-bd">
+                <div class="src" style="border-color:var(--plumbdr); background:var(--plumbg);">
+                    <div class="src-title" style="color:var(--plum);">Pension (SIPP)</div>
+                    <div class="fld fld-pre"><label>Pot Value</label><div class="wrap"><span class="pre">£</span><input type="number" id="pension" value="500000"></div></div>
+                </div>
+                <div class="src" style="border-color:var(--tealbdr); background:var(--tealbg);">
+                    <div class="src-title" style="color:var(--teal);">ISA Portfolio</div>
+                    <div class="fld fld-pre"><label>Balance</label><div class="wrap"><span class="pre">£</span><input type="number" id="isa" value="100000"></div></div>
+                </div>
+                <div class="src" style="border-color:var(--amberbdr); background:var(--amberbg);">
+                    <div class="src-title" style="color:var(--amber);">Offshore Bond</div>
+                    <div class="fld fld-pre"><label>Current Value</label><div class="wrap"><span class="pre">£</span><input type="number" id="obValue" value="150000"></div></div>
+                    <div class="fld fld-pre"><label>Initial Investment</label><div class="wrap"><span class="pre">£</span><input type="number" id="obOrig" value="100000"></div></div>
+                    <div class="fld"><label>Remaining Allowance Years</label><input type="number" id="obYears" value="20" max="20"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-hd">Income Sources</div>
+            <div class="panel-bd">
+                <div class="fld fld-pre"><label>State Pension (Annual)</label><div class="wrap"><span class="pre">£</span><input type="number" id="spAmt" value="11500"></div></div>
+                <div class="fld fld-pre"><label>Rental Income (Net/Year)</label><div class="wrap"><span class="pre">£</span><input type="number" id="rental" value="12000"></div></div>
+                <div class="fld fld-pre"><label>Target Net Total</label><div class="wrap"><span class="pre">£</span><input type="number" id="target" value="50000"></div></div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-hd">Scenario Settings</div>
+            <div class="panel-bd">
+                <div class="fld fld-suf"><label>Assumed Growth</label><div class="wrap"><input type="number" id="pg" value="5.0"><span class="suf">%</span></div></div>
+                <div class="fld fld-pre"><label>Cash Buffer</label><div class="wrap"><span class="pre">£</span><input type="number" id="cashPot" value="30000"></div></div>
+                <div class="fld" style="display:flex; align-items:center; gap:8px; margin-top:10px;">
+                    <input type="checkbox" id="crashToggle" checked>
+                    <label for="crashToggle" style="margin:0; color:var(--rose);">Apply Year 2 Crash (-20%)</label>
+                </div>
+                <button class="btn" style="margin-top:15px;" onclick="calculate()">Run Model</button>
+            </div>
+        </div>
+    </aside>
+
+    <div id="results-area">
+        <div class="panel" style="padding: 100px 40px; text-align: center;">
+            <h2 style="font-family:'Playfair Display';">Strategy Simulation Ready</h2>
+            <p style="color:var(--ink3); margin-top:10px;">Check your asset inputs and click 'Run Model'.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    let globalData = [];
+
+    function g(id){ return parseFloat(document.getElementById(id).value) || 0; }
+    function fmt(v){ return '£' + Math.round(v).toLocaleString('en-GB'); }
+
+    function calculate() {
+        const p = {
+            pension: g('pension'), isa: g('isa'), cash: g('cashPot'),
