@@ -1,10 +1,34 @@
+ 
+ 
+ 
+<!-- Retirement Planning Suite v2.25 — All-in-one HTML (single file)
+     Improvements included in this build (per your selections):
+       • Trust income treated as NET (no extra tax in model)
+       • Full explanations added on: Drawdown (Trust block), Market Shocks, Monte Carlo, Tax Optimiser, IHT
+       • Blended strategy fixed: only draw pension up to Personal Allowance WHEN NEEDED (not always)
+       • Personal Allowance taper (100k–125,140) applied to how much 0%-tax pension you can draw
+       • Offshore Bond 5% rule: cumulative allowance with carry-forward (up to 100%), explicit use vs taxable OB draw
+       • GIA withdrawals realise gains using FIFO-like unit lots (pragmatic average-lot approach with units)
+       • CGT annual exempt amount (AEA) £3,000 applied to realised gains; basic/higher CGT rates approximated at 18%/24%
+       • Dividend allowance £500; dividends taxed at 8.75%/33.75%/39.35% by band with top-slice stacking (simplified bands)
+       • RNRB tapering above £2,000,000 (£1-for-£2) in IHT
+       • IHT: manual “Include pension in estate” toggle retained (no auto-on)
+       • Market Shock mechanics clarified; visuals unchanged
+       • Monte Carlo kept simple (single average return per simulation), but explanation strengthened
+       • Year-by-year table now shows OB allowance used/available instead of “OB Yrs”
+       • Tooltips (ℹ️) added in key headings
+     Note: This is an illustrative educational model, not regulated advice. -->
+ 
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Retirement Planning Suite v2.25 — Drawdown · Stress · Monte Carlo · IHT · Tax</title>
+<title>Retirement Planning Suite v2.25</title>
+ 
+<!-- Fonts -->
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
+ 
 <style>
 :root{
   --royal:#1C3F7A;--royal-dk:#142D5A;--royal-md:#2A52A0;--royal-lt:#3A6CC8;
@@ -19,51 +43,42 @@
   --ink:#1E2530;--ink2:#2E3645;--ink3:#4A5568;--ink4:#6B7A90;
   --border:#D8DDE6;--border2:#C4CBD8;
   --bg:#F4F6F9;--bg2:#EDF0F5;--bg3:#E2E7EF;--white:#FFFFFF;
-  --err:#B91C1C;--err-bg:rgba(185,28,28,0.05);--warn:#B45309;--ok:#166534;
+  --err:#B91C1C;--err-bg:rgba(185,28,28,0.05);--ok:#166534;
   --shadow-sm:0 1px 2px rgba(0,0,0,0.05),0 2px 8px rgba(0,0,0,0.04);
-  --r:6px;--r2:10px;
+  --r:6px;--r2:10px
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:var(--bg);font-family:'Source Sans 3',sans-serif;color:var(--ink);min-height:100vh;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-track{background:var(--bg2)}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
- 
 .hdr{background:var(--royal-dk);border-bottom:3px solid var(--royal-lt);padding:11px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:0 2px 12px rgba(0,0,0,0.2);gap:10px;flex-wrap:wrap}
 .hdr-title{font-family:'Libre Baskerville',serif;font-size:16px;font-weight:700;color:#fff}
 .hdr-sub{font-size:10px;color:rgba(255,255,255,0.42);letter-spacing:.07em;text-transform:uppercase;margin-top:1px}
 .hdr-tags{display:flex;gap:5px;flex-wrap:wrap}
 .tag{padding:3px 9px;border-radius:3px;font-size:10px;font-weight:600;letter-spacing:.04em;border:1px solid;text-transform:uppercase}
- 
 .tab-nav{background:var(--royal-dk);border-bottom:1px solid rgba(255,255,255,0.1);padding:0 24px;display:flex;gap:0;overflow-x:auto}
 .tab-btn{padding:10px 18px;font-size:12px;font-weight:600;color:rgba(255,255,255,0.5);background:none;border:none;border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap;font-family:'Source Sans 3',sans-serif;letter-spacing:.03em;transition:all .15s}
 .tab-btn:hover{color:rgba(255,255,255,0.8)}
 .tab-btn.active{color:#fff;border-bottom-color:var(--royal-lt)}
 .tab-content{display:none}
 .tab-content.active{display:block}
- 
 .main{max-width:1560px;margin:0 auto;padding:16px 18px;display:grid;grid-template-columns:300px 1fr;gap:14px;align-items:start}
 .main-full{max-width:1560px;margin:0 auto;padding:16px 18px}
- 
 .panel{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow-sm);margin-bottom:10px;overflow:hidden}
 .panel-hd{padding:10px 14px;border-bottom:1px solid var(--border);background:linear-gradient(to right,var(--bg),var(--bg2));display:flex;align-items:center;gap:7px}
 .panel-hd-icon{width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;background:var(--royal-bg)}
 .panel-hd-title{font-family:'Libre Baskerville',serif;font-size:12.5px;font-weight:700;color:var(--royal)}
+.panel-hd small{color:var(--ink4);font-size:10px}
 .panel-bd{padding:14px}
- 
 .src{border-radius:var(--r);padding:11px;margin-bottom:7px;border:1px solid;border-left-width:3px}
 .src-label{font-size:9.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px}
-.src-desc{font-size:10.5px;margin-bottom:8px;color:var(--ink4);font-style:italic}
-.info{font-size:10.75px;color:var(--ink4);background:var(--bg2);border:1px dashed var(--border2);padding:8px;border-radius:6px;margin-top:6px}
-.info small{color:var(--ink3)}
-.i{display:inline-block;background:var(--royal-bg);color:var(--royal);font-weight:800;border:1px solid var(--royal-bdr);border-radius:50%;width:16px;height:16px;line-height:14px;text-align:center;font-size:11px;margin-right:5px}
- 
+.src-desc{font-size:11px;margin-bottom:8px;color:var(--ink4);font-style:italic}
 .fld{margin-bottom:7px}
 .fld label{display:block;font-size:11px;font-weight:500;color:var(--ink3);margin-bottom:2px}
 .fld .wrap{position:relative}
 .fld .pre{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:11px;color:var(--ink4);pointer-events:none;z-index:1;font-weight:500}
 .fld .suf{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-size:10.5px;color:var(--ink4);pointer-events:none;font-weight:500}
- 
 input[type=number],input[type=text],select{width:100%;padding:6px 9px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--ink);font-size:12px;font-family:'Source Code Pro',monospace;outline:none;transition:border-color .12s,box-shadow .12s,background .12s}
 input[type=number]:focus,input[type=text]:focus,select:focus{border-color:var(--royal-md);box-shadow:0 0 0 3px rgba(42,82,160,.1);background:var(--white)}
 input[type=number]::-webkit-inner-spin-button{opacity:.25}
@@ -71,32 +86,26 @@ select{font-family:'Source Sans 3',sans-serif;font-size:12px}
 .fld.pre input{padding-left:20px}
 .fld.suf input{padding-right:26px}
 .fr{display:grid;grid-template-columns:1fr 1fr;gap:6px}
- 
 .sl{font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--royal);margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid var(--royal-bdr)}
- 
 .btn{width:100%;padding:10px 14px;background:var(--royal);color:#fff;border:none;border-radius:var(--r);font-size:13px;font-weight:600;cursor:pointer;margin-top:10px;font-family:'Source Sans 3',sans-serif;letter-spacing:.03em;transition:background .13s,box-shadow .13s;display:flex;align-items:center;justify-content:center;gap:7px}
 .btn:hover{background:var(--royal-md);box-shadow:0 2px 8px rgba(28,63,122,.25)}
 .btn:active{background:var(--royal-dk)}
 .btn-sm{padding:6px 12px;font-size:11.5px;width:auto;margin-top:0}
 .btn-outline{background:transparent;border:1.5px solid var(--royal);color:var(--royal)}
 .btn-outline:hover{background:var(--royal-bg)}
- 
 .kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .kpi-grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:12px}
 .kpi-card{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);padding:12px 14px;box-shadow:var(--shadow-sm);border-top:3px solid}
 .kpi-lbl{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink4);margin-bottom:4px}
 .kpi-v{font-family:'Source Code Pro',monospace;font-size:18px;font-weight:500;line-height:1;margin-bottom:2px}
 .kpi-note{font-size:10px;color:var(--ink4)}
- 
 .banner{border-radius:var(--r2);padding:12px 16px;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;border:1px solid;border-left:3px solid}
 .banner-title{font-family:'Libre Baskerville',serif;font-size:13px;font-weight:700;margin-bottom:3px}
 .banner-body{font-size:12px;line-height:1.7;color:var(--ink2)}
- 
 .rpanel{background:var(--white);border:1px solid var(--border);border-radius:var(--r2);box-shadow:var(--shadow-sm);margin-bottom:10px;overflow:hidden}
 .rpanel-hd{padding:10px 14px;border-bottom:1px solid var(--border);background:var(--bg);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .rpanel-title{font-family:'Libre Baskerville',serif;font-size:12.5px;font-weight:700;color:var(--ink)}
 .rpanel-bd{padding:12px 14px}
- 
 .tbl-wrap{overflow-x:auto;max-height:380px;overflow-y:auto}
 table{width:100%;border-collapse:collapse;font-size:11.5px}
 th{background:var(--royal-dk);color:rgba(255,255,255,.8);padding:7px 9px;text-align:right;font-size:9px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;position:sticky;top:0;white-space:nowrap;font-family:'Source Sans 3',sans-serif}
@@ -108,62 +117,46 @@ tr:hover td{background:rgba(28,63,122,.03)}
 .depl-row td{background:rgba(185,28,28,.04)!important}
 .shock-row td{background:rgba(146,96,10,.05)!important}
 .badge{display:inline-block;padding:1px 6px;border-radius:3px;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-family:'Source Sans 3',sans-serif}
- 
 .leg{display:flex;gap:12px;flex-wrap:wrap}
 .leg-item{display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--ink3);font-weight:500}
 .leg-dot{width:9px;height:9px;border-radius:2px}
- 
 .insight{background:var(--royal-bg);border:1px solid var(--royal-bdr);border-left:3px solid var(--royal);border-radius:var(--r2);padding:12px 14px;display:flex;gap:9px;margin-bottom:4px}
 .insight-body{font-size:12px;color:var(--ink2);line-height:1.75}
- 
 .scenario-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
 .scenario-card{border-radius:var(--r2);padding:14px;border:1.5px solid}
 .scenario-title{font-family:'Libre Baskerville',serif;font-size:12px;font-weight:700;margin-bottom:8px}
 .scenario-stat{margin-bottom:5px}
 .scenario-stat-lbl{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink4)}
 .scenario-stat-val{font-family:'Source Code Pro',monospace;font-size:15px;font-weight:500}
- 
 .mc-bar-bg{flex:1;height:10px;background:var(--bg3);border-radius:5px;overflow:hidden}
 .mc-bar-fill{height:100%;border-radius:5px;transition:width .4s ease}
- 
 .iht-meter{height:12px;background:var(--bg3);border-radius:6px;overflow:hidden;margin:6px 0}
 .iht-meter-fill{height:100%;background:linear-gradient(to right,var(--forest),var(--amber),var(--err));border-radius:6px;transition:width .4s}
 .band-note{font-size:10px;color:var(--ink4);font-style:italic;margin-top:4px}
- 
 .empty{padding:48px 32px;text-align:center}
 .empty-icon{font-size:40px;margin-bottom:12px;opacity:.22}
 .empty-title{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:8px}
 .empty-body{font-size:12.5px;color:var(--ink3);line-height:1.85;max-width:420px;margin:0 auto}
- 
 .footer{text-align:center;padding:12px;font-size:10px;color:var(--ink4);border-top:1px solid var(--border);margin-top:4px;letter-spacing:.02em;background:var(--white)}
- 
 .taxband-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;font-size:11.5px}
 .taxband-bar{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden}
 .taxband-fill{height:100%;border-radius:4px}
- 
 .toggle-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
 .toggle-lbl{font-size:11.5px;color:var(--ink3);font-weight:500}
 .toggle{width:32px;height:18px;background:var(--border2);border-radius:9px;position:relative;cursor:pointer;transition:background .15s;flex-shrink:0}
 .toggle.on{background:var(--royal)}
 .toggle::after{content:'';width:14px;height:14px;background:#fff;border-radius:50%;position:absolute;top:2px;left:2px;transition:left .15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .toggle.on::after{left:16px}
- 
-.tip{display:inline-block;color:var(--ink4);font-size:10.5px;margin-left:6px}
-.tip a{color:var(--ink3);text-decoration:underline dotted}
- 
-@media(max-width:900px){
-  .main{grid-template-columns:1fr}
-  .scenario-grid{grid-template-columns:1fr}
-  .kpi-grid,.kpi-grid-5{grid-template-columns:1fr 1fr}
-}
+.info{color:var(--royal);cursor:help;font-weight:700}
+@media(max-width:900px){.main{grid-template-columns:1fr}.scenario-grid{grid-template-columns:1fr}.kpi-grid,.kpi-grid-5{grid-template-columns:1fr 1fr}}
 </style>
 </head>
 <body>
  
 <header class="hdr">
   <div>
-    <div class="hdr-title">Retirement Planning Suite v2.25</div>
-    <div class="hdr-sub">Drawdown · Stress Testing · Monte Carlo · IHT · Tax Optimiser — Illustrative Example Only</div>
+    <div class="hdr-title">Retirement Planning Suite <span style="opacity:.65;font-weight:400">v2.25</span></div>
+    <div class="hdr-sub">Drawdown · Stress Testing · Monte Carlo · IHT · Tax Optimisation — Illustrative Example Only</div>
   </div>
   <div class="hdr-tags">
     <span class="tag" style="color:#8C9BB5;border-color:rgba(140,155,181,.4);background:rgba(140,155,181,.08)">Base Case</span>
@@ -182,29 +175,1026 @@ tr:hover td{background:rgba(28,63,122,.03)}
   <button class="tab-btn" onclick="switchTab('tax',this)">&#9878; Tax Optimiser</button>
 </nav>
  
-<!-- ======================= DRAWNDOWN TAB ======================= -->
+<!-- DRAW DOWN TAB -->
 <div id="tab-drawdown" class="tab-content active">
-  <div class="main">
-    <div>
-      <!-- Capital Sources -->
-      <div class="panel">
-        <div class="panel-hd"><div class="panel-hd-icon">&#128188;</div><span class="panel-hd-title">Capital Sources</span></div>
-        <div class="panel-bd">
+<div class="main">
+  <div>
+    <div class="panel">
+      <div class="panel-hd">
+        <div class="panel-hd-icon">&#128188;</div>
+        <span class="panel-hd-title">Capital Sources</span>
+        <small title="Set starting balances, realistic growth and fees. Growth rates are long-run net of cash drag; fees are applied against all wrappers.">ℹ️</small>
+      </div>
+      <div class="panel-bd">
+        <div class="src" style="background:var(--royal-bg);border-color:var(--royal-bdr);border-left-color:var(--royal)">
+          <div class="src-label" style="color:var(--royal)">Pension (SIPP)</div>
+          <div class="src-desc">Withdrawals taxed as earned income. PA taper will be applied in draw order.</div>
+          <div class="fld pre"><label>Fund Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="pension" value="400000" step="10000"></div></div>
+          <div class="fld pre"><label>PCLS (Tax-Free Cash)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="pcls" value="100000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="pg" value="5.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+        </div>
  
-          <div class="src" style="background:var(--royal-bg);border-color:var(--royal-bdr);border-left-color:var(--royal)">
-            <div class="src-label" style="color:var(--royal)">Pension (SIPP)</div>
-            <div class="src-desc">Withdrawals taxed as earned income (subject to Personal Allowance and taper)</div>
-            <div class="fld pre"><label>Fund Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="pension" value="400000" step="10000"></div></div>
-            <div class="fld pre"><label>PCLS (Tax‑Free Cash)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="pcls" value="100000" step="5000"></div></div>
-            <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="pg" value="5.0" step="0.1"><span class="suf">% p.a.</span></div></div>
-            <div class="info"><span class="i">i</span><strong>Personal Allowance</strong> is £12,570 (2025/26) and tapers by £1 for every £2 of income over £100,000 — reduced to £0 at £125,140. This model applies the taper when calculating pension withdrawals within the blended strategy. [1](https://www.gov.uk/income-tax-rates)</div>
+        <div class="src" style="background:var(--plum-bg);border-color:var(--plum-bdr);border-left-color:var(--plum)">
+          <div class="src-label" style="color:var(--plum)">DB Pension</div>
+          <div class="src-desc">Defined benefit — fixed income with escalation</div>
+          <div class="fld pre"><label>Annual DB Income</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="dbAmt" value="8000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts Age</label><div class="wrap"><input type="number" id="dbAge" value="65" step="1"></div></div>
+            <div class="fld suf"><label>Escalation</label><div class="wrap"><input type="number" id="dbIdx" value="2.5" step="0.1"><span class="suf">% p.a.</span></div></div>
           </div>
+          <div class="fld suf"><label>Spouse Fraction on Death</label><div class="wrap"><input type="number" id="dbSpouse" value="50" step="5" min="0" max="100"><span class="suf">%</span></div></div>
+        </div>
  
-          <div class="src" style="background:var(--plum-bg);border-color:var(--plum-bdr);border-left-color:var(--plum)">
-            <div class="src-label" style="color:var(--plum)">DB Pension</div>
-            <div class="src-desc">Defined benefit — fixed income with escalation</div>
+        <div class="src" style="background:var(--forest-bg);border-color:var(--forest-bdr);border-left-color:var(--forest)">
+          <div class="src-label" style="color:var(--forest)">ISA</div>
+          <div class="src-desc">All withdrawals completely tax free</div>
+          <div class="fld pre"><label>Balance</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="isa" value="100000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="ig" value="5.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+        </div>
  
+        <div class="src" style="background:var(--sage-bg);border-color:var(--sage-bdr);border-left-color:var(--sage)">
+          <div class="src-label" style="color:var(--sage)">GIA</div>
+          <div class="src-desc">CGT on realised gains. Annual exempt amount £3,000 applied.</div>
+          <div class="fld pre"><label>Balance</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="gia" value="50000" step="5000"></div></div>
+          <div class="fld pre"><label>Cost Basis (today)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="giaCost" value="50000" step="1000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="gg" value="4.5" step="0.1"><span class="suf">% p.a.</span></div></div>
+          <div class="fld pre"><label>Annual Dividends (gross)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="divAmt" value="2000" step="100"></div></div>
+          <div class="fld suf"><label>Dividend Growth Rate</label><div class="wrap"><input type="number" id="divGrowth" value="3.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+        </div>
  
+        <div class="src" style="background:var(--steel-bg);border-color:var(--steel-bdr);border-left-color:var(--steel)">
+          <div class="src-label" style="color:var(--steel)">Offshore Bond</div>
+          <div class="src-desc">5% p.a. tax-deferred allowance, unused carries forward (up to 100% of premiums)</div>
+          <div class="fld pre"><label>Surrender Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ob" value="150000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="obg" value="5.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+          <div class="src-desc" style="margin-top:6px;color:var(--ink4)">The model tracks your **cumulative allowance** and uses it first (no immediate tax). Above that, OB withdrawals are treated as **taxable income**.</div>
+        </div>
+ 
+        <div class="fld suf"><label>Annual Fees (all wrappers)</label><div class="wrap"><input type="number" id="fees" value="0.5" step="0.05"><span class="suf">% p.a.</span></div></div>
+      </div>
+    </div>
+ 
+    <div class="panel">
+      <div class="panel-hd">
+        <div class="panel-hd-icon">&#128200;</div>
+        <span class="panel-hd-title">Guaranteed Income</span>
+        <small title="Guaranteed inflows reduce the draw required from capital. Rental and Trust are modelled as NET cashflows.">ℹ️</small>
+      </div>
+      <div class="panel-bd">
+        <div class="src" style="background:var(--steel-bg);border-color:var(--steel-bdr);border-left-color:var(--steel)">
+          <div class="src-label" style="color:var(--steel)">State Pension</div>
+          <div class="src-desc">Indexed by your chosen rate</div>
+          <div class="fld pre"><label>Annual (gross)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="spAmt" value="11500" step="100"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts Age</label><div class="wrap"><input type="number" id="spAge" value="67" step="1"></div></div>
+            <div class="fld suf"><label>Index %</label><div class="wrap"><input type="number" id="spIdx" value="3.5" step="0.1"><span class="suf">% p.a.</span></div></div>
+          </div>
+        </div>
+ 
+        <div class="src" style="background:var(--amber-bg);border-color:var(--amber-bdr);border-left-color:var(--amber)">
+          <div class="src-label" style="color:var(--amber)">Annuity</div>
+          <div class="src-desc">Purchase from pension at chosen age</div>
+          <div class="toggle-row"><span class="toggle-lbl">Include annuity purchase</span><div class="toggle" id="annuityToggle" onclick="toggleAnnuity()"></div></div>
+          <div id="annuityFields" style="display:none">
+            <div class="fld"><label>Purchase Age</label><div class="wrap"><input type="number" id="annuityAge" value="75" step="1"></div></div>
+            <div class="fld pre"><label>Amount from Pension</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="annuityPot" value="100000" step="5000"></div></div>
+            <div class="fld suf"><label>Annuity Rate</label><div class="wrap"><input type="number" id="annuityRate" value="5.5" step="0.1"><span class="suf">% p.a.</span></div></div>
+          </div>
+        </div>
+ 
+        <div class="src" style="background:var(--fern-bg);border-color:var(--fern-bdr);border-left-color:var(--fern)">
+          <div class="src-label" style="color:var(--fern)">Rental Income</div>
+          <div class="src-desc">Net after costs (not re-taxed in the model)</div>
+          <div class="fld pre"><label>Annual Net</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="rental" value="12000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>From Age</label><div class="wrap"><input type="number" id="rentalAge" value="65" step="1"></div></div>
+            <div class="fld"><label>To Age (0=always)</label><div class="wrap"><input type="number" id="rentalEnd" value="0" step="1"></div></div>
+          </div>
+          <div class="fld suf"><label>Annual Increase</label><div class="wrap"><input type="number" id="rentalIdx" value="3.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+        </div>
+ 
+        <div class="src" style="background:var(--slate-bg);border-color:var(--slate-bdr);border-left-color:var(--slate)">
+          <div class="src-label" style="color:var(--slate)">Trust / Other</div>
+          <div class="src-desc">Assumed NET of tax. Reduces capital draw directly.</div>
+          <div class="fld pre"><label>Annual Net</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="trust" value="5000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>From Age</label><div class="wrap"><input type="number" id="trustAge" value="65" step="1"></div></div>
+            <div class="fld"><label>To Age (0=always)</label><div class="wrap"><input type="number" id="trustEnd" value="0" step="1"></div></div>
+          </div>
+          <div class="fld suf"><label>Annual Increase</label><div class="wrap"><input type="number" id="trustIdx" value="2.5" step="0.1"><span class="suf">% p.a.</span></div></div>
+          <div class="src-desc" style="margin-top:4px">
+            <strong>How trust income is treated:</strong> It is added as **net cashflow** and is not taxed again in this model. It reduces the required withdrawals from capital each year.
+          </div>
+        </div>
+      </div>
+    </div>
+ 
+    <div class="panel">
+      <div class="panel-hd">
+        <div class="panel-hd-icon">&#9881;&#65039;</div>
+        <span class="panel-hd-title">Spending &amp; Tax</span>
+        <small title="Two spending phases supported. Phase 2 begins at your care start age. Income tax bands are simplified via P1/P2 %, but PA taper, dividend rules and CGT AEA are applied.">ℹ️</small>
+      </div>
+      <div class="panel-bd">
+        <div class="sl">Timeline</div>
+        <div class="fr">
+          <div class="fld"><label>Start Age</label><div class="wrap"><input type="number" id="sa" value="65" step="1"></div></div>
+          <div class="fld"><label>Model Years</label><div class="wrap"><input type="number" id="ty" value="35" step="1"></div></div>
+        </div>
+        <div class="fld"><label>Phase 2 Care Start Age</label><div class="wrap"><input type="number" id="ca" value="80" step="1"></div></div>
+ 
+        <div class="sl">Net Spending Target (today's &#163;)</div>
+        <div class="fr">
+          <div class="fld pre"><label>Phase 1</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="sp1" value="40000" step="500"></div></div>
+          <div class="fld pre"><label>Phase 2 Care</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="sp2" value="80000" step="500"></div></div>
+        </div>
+ 
+        <div class="sl">Tax Rates (P1/P2 apply to taxable non-dividend income after PA)</div>
+        <div class="fr">
+          <div class="fld suf"><label>Income Tax P1</label><div class="wrap"><input type="number" id="t1" value="20" step="1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Income Tax P2</label><div class="wrap"><input type="number" id="t2" value="20" step="1"><span class="suf">% </span></div></div>
+        </div>
+        <div class="fr">
+          <div class="fld suf"><label>CGT (display only)</label><div class="wrap"><input type="number" id="cg" value="18" step="1" disabled><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Dividend Tax (banded)</label><div class="wrap"><input type="number" id="divTax" value="8.75" step="0.25" disabled><span class="suf">%*</span></div></div>
+        </div>
+        <div class="src-desc" style="margin-top:2px">* Dividends: 8.75% / 33.75% / 39.35% by band; £500 allowance applied; PA interactions simplified as top-slice.</div>
+ 
+        <div class="sl">Inflation</div>
+        <div class="fr">
+          <div class="fld suf"><label>Phase 1</label><div class="wrap"><input type="number" id="i1" value="2.5" step="0.1"><span class="suf">% p.a.</span></div></div>
+          <div class="fld suf"><label>Phase 2</label><div class="wrap"><input type="number" id="i2" value="4.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+        </div>
+ 
+        <button class="btn" onclick="runAll()"><span>Run Full Analysis</span><span style="font-size:15px">&#8594;</span></button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="results">
+    <div class="rpanel"><div class="empty"><div class="empty-icon">&#9878;</div><div class="empty-title">Retirement Planning Suite</div><div class="empty-body">Configure all inputs on the left then click <strong>Run Full Analysis</strong>. Results populate all six tabs simultaneously.</div></div></div>
+  </div>
+</div>
+</div>
+ 
+<!-- MARKET SHOCK TAB -->
+<div id="tab-shock" class="tab-content">
+  <div class="main-full">
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:14px;align-items:start">
+      <div>
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-icon">&#9889;</div>
+            <span class="panel-hd-title">Market Shock Scenarios</span>
+            <small title="Shocks apply a one-off level fall to capital balances in the chosen year; incomes are unaffected.">ℹ️</small>
+          </div>
+          <div class="panel-bd">
+            <p style="font-size:11.5px;color:var(--ink3);margin-bottom:8px;line-height:1.7">
+              <strong>How shocks work:</strong><br>
+              • A shock is a <em>one‑off fall</em> in that model year (e.g., −30% in Year 5).<br>
+              • The fall applies to <em>all capital wrappers</em> (Pension, ISA, GIA, Offshore Bond); <em>guaranteed incomes</em> are unchanged.<br>
+              • After the shock year, balances resume normal growth.<br>
+              • Multiple shocks can be added and will stack if in the same year.
+            </p>
+            <div id="shockList"></div>
+            <button class="btn btn-outline btn-sm" onclick="addShock()" style="margin-top:6px;width:100%">+ Add Shock Event</button>
+            <div class="sl">Preset Scenarios</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <button class="btn btn-outline btn-sm" onclick="loadPreset('covid')">2020 Covid<br><small style="font-weight:400">−33% yr 5</small></button>
+              <button class="btn btn-outline btn-sm" onclick="loadPreset('gfc')">2008 GFC<br><small style="font-weight:400">−45% yr 3</small></button>
+              <button class="btn btn-outline btn-sm" onclick="loadPreset('dotcom')">2000 Dotcom<br><small style="font-weight:400">−40% yr 2</small></button>
+              <button class="btn btn-outline btn-sm" onclick="loadPreset('double')">Double Dip<br><small style="font-weight:400">−25% yr 3+8</small></button>
+            </div>
+            <button class="btn" onclick="runAll()" style="margin-top:10px"><span>Run Shock Analysis</span></button>
+          </div>
+        </div>
+      </div>
+      <div id="shockResults"><div class="rpanel"><div class="empty"><div class="empty-icon">&#9889;</div><div class="empty-title">Market Shock Analysis</div><div class="empty-body">Add shock events on the left and click Run Shock Analysis.</div></div></div></div>
+    </div>
+  </div>
+</div>
+ 
+<!-- STRESS -->
+<div id="tab-stress" class="tab-content">
+  <div class="main-full" id="stressResults">
+    <div class="rpanel"><div class="empty"><div class="empty-icon">&#127777;</div><div class="empty-title">Stress Testing</div><div class="empty-body">Run Full Analysis from the Drawdown tab to populate stress tests.</div></div></div>
+  </div>
+</div>
+ 
+<!-- MONTE CARLO -->
+<div id="tab-monte" class="tab-content">
+  <div class="main-full">
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start">
+      <div>
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-icon">&#127922;</div>
+            <span class="panel-hd-title">Monte Carlo Settings</span>
+            <small title="This version uses a simple approach: each simulation draws one average return around your mean.">ℹ️</small>
+          </div>
+          <div class="panel-bd">
+            <p style="font-size:11.5px;color:var(--ink3);margin-bottom:10px;line-height:1.7">
+              <strong>What this shows:</strong> We run many random scenarios around your growth rate to estimate the probability your plan
+              survives to a target age. A simulation is a <em>success</em> if the portfolio still has funds at that age. (Guaranteed incomes are stable.)
+            </p>
+            <div class="fld suf"><label>Return Volatility (Std Dev)</label><div class="wrap"><input type="number" id="mcVol" value="12" step="1" min="5" max="30"><span class="suf">% p.a.</span></div></div>
+            <div class="fld"><label>Simulations</label><div class="wrap"><select id="mcSims"><option value="200">200 (fast)</option><option value="500" selected>500 (standard)</option><option value="1000">1,000 (precise)</option></select></div></div>
+            <div class="fld"><label>Success = fund survives to age</label><div class="wrap"><input type="number" id="mcTarget" value="90" step="1" min="75" max="100"></div></div>
+            <button class="btn" onclick="runMonte()"><span>Run Monte Carlo</span></button>
+          </div>
+        </div>
+      </div>
+      <div id="monteResults"><div class="rpanel"><div class="empty"><div class="empty-icon">&#127922;</div><div class="empty-title">Monte Carlo Simulation</div><div class="empty-body">Run Full Analysis first, then click Run Monte Carlo.</div></div></div></div>
+    </div>
+  </div>
+</div>
+ 
+<!-- IHT -->
+<div id="tab-iht" class="tab-content">
+  <div class="main-full">
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start">
+      <div>
+        <div class="panel">
+          <div class="panel-hd">
+            <div class="panel-hd-icon">&#127963;</div>
+            <span class="panel-hd-title">IHT &amp; Estate Planning</span>
+            <small title="Estate uses the remaining balances at your chosen death age from the Blended run. Property less mortgage; ISAs, GIAs, OB, (optionally) Pension. RNRB taper applied.">ℹ️</small>
+          </div>
+          <div class="panel-bd">
+            <div class="fld pre"><label>Main Residence Value</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ihtProperty" value="500000" step="10000"></div></div>
+            <div class="fld suf"><label>Property Growth Rate</label><div class="wrap"><input type="number" id="ihtPropGrowth" value="3.0" step="0.1"><span class="suf">% p.a.</span></div></div>
+            <div class="fld pre"><label>Mortgage Outstanding</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ihtMortgage" value="0" step="5000"></div></div>
+            <div class="fld pre"><label>Other Assets</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="ihtOther" value="20000" step="5000"></div></div>
+ 
+            <div class="sl">IHT Allowances</div>
+            <div class="fld pre"><label>Nil Rate Band</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="nrb" value="325000" step="5000"></div></div>
+            <div class="fld pre"><label>RNRB (residence, direct descendants)</label><div class="wrap"><span class="pre">&#163;</span><input type="number" id="rnrb" value="175000" step="5000"></div></div>
+            <div class="fld suf"><label>IHT Rate</label><div class="wrap"><input type="number" id="ihtRate" value="40" step="5"><span class="suf">% </span></div></div>
+ 
+            <div class="sl">Pension IHT (from April 2027)</div>
+            <div class="toggle-row"><span class="toggle-lbl">Include pension in estate</span><div class="toggle on" id="pensionIHTToggle" onclick="togglePensionIHT()"></div></div>
+ 
+            <div class="fld"><label>Death Age (for projection)</label><div class="wrap"><input type="number" id="ihtDeathAge" value="85" step="1"></div></div>
+            <button class="btn" onclick="runIHT()"><span>Calculate Estate</span></button>
+ 
+            <div class="src-desc" style="margin-top:10px">
+              <strong>How this is computed:</strong> We take the <em>remaining balances</em> at your chosen death age from the latest <strong>Blended</strong> run:
+              Property (less mortgage), ISA, GIA, Offshore Bond, Other Assets, and — if the toggle is on — Pension. RNRB taper £1 per £2 over £2m applied.
+              Trust income is assumed distributed and <em>not</em> part of the estate in this model.
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="ihtResults"><div class="rpanel"><div class="empty"><div class="empty-icon">&#127963;</div><div class="empty-title">IHT &amp; Estate Projection</div><div class="empty-body">Run the Drawdown analysis first, then click Calculate Estate.</div></div></div></div>
+    </div>
+  </div>
+</div>
+ 
+<!-- TAX -->
+<div id="tab-tax" class="tab-content">
+  <div class="main-full" id="taxResults">
+    <div class="rpanel"><div class="empty"><div class="empty-icon">&#9878;</div><div class="empty-title">Tax Band Optimiser</div><div class="empty-body">Run the Drawdown analysis first to populate the year-by-year tax band breakdown.</div></div></div>
+  </div>
+</div>
+ 
+<div class="footer">For illustrative purposes only &nbsp;&middot;&nbsp; Not financial advice &nbsp;&middot;&nbsp; Tax treatment depends on individual circumstances and may change &nbsp;&middot;&nbsp; Figures are projections only and not guaranteed</div>
+ 
+<script>
+/*** ===========================
+     Global State & Utilities
+==============================*/
+var shocks=[];
+var lastP=null,lastBl=null,lastPf=null,lastIf_=null,lastOb_=null;
+var pensionInEstate=true;
+ 
+// Helpers
+function g(id){return parseFloat(document.getElementById(id).value)||0;}
+function ff(v){if(!v&&v!==0)return'--';if(v===0)return'--';var n=v<0,a=Math.abs(v);return(n?'-':'')+'£'+Math.round(a).toLocaleString('en-GB');}
+function ffz(v){if(v==null||isNaN(v))return'--';var n=v<0,a=Math.abs(v);return(n?'-':'')+'£'+Math.round(a).toLocaleString('en-GB');}
+function fmt(v){if(v==null||isNaN(v))return'--';var n=v<0,a=Math.abs(v);var s=a>=1e6?(a/1e6).toFixed(2)+'m':a>=1000?Math.round(a/1000)+'k':Math.round(a)+'';return(n?'-':'')+'£'+s;}
+function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
+ 
+function switchTab(name,btn){
+  document.querySelectorAll('.tab-content').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+function toggleAnnuity(){
+  var t=document.getElementById('annuityToggle');
+  t.classList.toggle('on');
+  document.getElementById('annuityFields').style.display=t.classList.contains('on')?'block':'none';
+}
+function togglePensionIHT(){
+  document.getElementById('pensionIHTToggle').classList.toggle('on');
+  pensionInEstate=document.getElementById('pensionIHTToggle').classList.contains('on');
+}
+ 
+/*** ===========================
+     Inputs Capture
+==============================*/
+function getParams(){
+  return{
+    pension:g('pension'),pcls:g('pcls'),pg:g('pg')/100,
+    isa:g('isa'),ig:g('ig')/100,
+    gia:g('gia'),giaCost:g('giaCost'),gg:g('gg')/100,
+    ob:g('ob'),obg:g('obg')/100,
+    fees:g('fees')/100,
+ 
+    dbAmt:g('dbAmt'),dbAge:g('dbAge'),dbIdx:g('dbIdx')/100,dbSpouse:g('dbSpouse')/100,
+    spAmt:g('spAmt'),spAge:g('spAge'),spIdx:g('spIdx')/100,
+    rental:g('rental'),rentalAge:g('rentalAge'),rentalEnd:g('rentalEnd'),rentalIdx:g('rentalIdx')/100,
+    trust:g('trust'),trustAge:g('trustAge'),trustEnd:g('trustEnd'),trustIdx:g('trustIdx')/100,
+ 
+    annuityOn:document.getElementById('annuityToggle').classList.contains('on'),
+    annuityAge:g('annuityAge'),annuityPot:g('annuityPot'),annuityRate:g('annuityRate')/100,
+ 
+    sa:g('sa'),ty:g('ty'),ca:g('ca'),
+    sp1:g('sp1'),sp2:g('sp2'),
+    // Income tax modelling: use user P1/P2 rates for non-dividend taxable income (after PA)
+    t1:g('t1')/100,t2:g('t2')/100,
+ 
+    // Dividends
+    divAmt:g('divAmt'),divGrowth:g('divGrowth')/100,
+ 
+    // Inflation by phase
+    i1:g('i1')/100,i2:g('i2')/100
+  };
+}
+ 
+/*** ===========================
+     Colours
+==============================*/
+var C={
+  pension:'#1C3F7A',isa:'#1A5C3A',gia:'#4A7C6F',ob:'#2C5F8A',
+  sp:'#3D6480',rental:'#2E7D52',trust:'#4A6FA5',db:'#5C3A7A',
+  annuity:'#92600A',div:'#1A5C7A',
+  forest:'#1A5C3A',fern:'#2E7D52',sage:'#4A7C6F',steel:'#2C5F8A',
+  amber:'#92600A',slate:'#3D6480',err:'#B91C1C',
+  pfLine:'#8C9BB5',isaLine:'#2C5F8A',obLine:'#4A7C6F',blLine:'#1C3F7A'
+};
+ 
+/*** ===========================
+     Charts
+==============================*/
+function drawLine(id,rows,keys,cols,dashes,bands){
+  var cv=document.getElementById(id);if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.offsetWidth,H=cv.height=200;
+  ctx.clearRect(0,0,W,H);
+  var pd={t:12,r:14,b:26,l:66};
+  var cW=W-pd.l-pd.r,cH=H-pd.t-pd.b;
+  var all=[];
+  rows.forEach(r=>keys.forEach(k=>{if(r[k]!=null)all.push(r[k]);}));
+  if(bands){bands.forEach(b=>{b.hi.forEach(v=>all.push(v));b.lo.forEach(v=>all.push(v));});}
+  var mn=Math.min(0,Math.min.apply(null,all)),mx=Math.max.apply(null,all)||1,rng=mx-mn||1;
+  function xp(i){return pd.l+(rows.length>1?i*cW/(rows.length-1):cW/2);}
+  function yp(v){return pd.t+cH-(v-mn)/rng*cH;}
+  ctx.strokeStyle='rgba(0,0,0,0.05)';
+  for(var i=0;i<=4;i++){
+    var y=pd.t+cH*i/4;
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';ctx.fillText(fmt(mx-rng*i/4),2,y+3);
+  }
+  if(bands){
+    bands.forEach(function(b){
+      ctx.beginPath();ctx.moveTo(xp(0),yp(b.hi[0]));
+      for(var i=1;i<rows.length;i++)ctx.lineTo(xp(i),yp(b.hi[i]));
+      for(var i=rows.length-1;i>=0;i--)ctx.lineTo(xp(i),yp(b.lo[i]||0));
+      ctx.closePath();ctx.fillStyle=b.color;ctx.fill();
+    });
+  }
+  rows.forEach(function(r,ri){
+    if(r.shock&&r.shock<0){
+      ctx.fillStyle='rgba(185,28,28,0.1)';
+      ctx.fillRect(xp(ri)-2,pd.t,4,cH);
+    }
+  });
+  keys.forEach(function(k,ki){
+    ctx.strokeStyle=cols[ki];ctx.lineWidth=ki===keys.length-1?2.5:1.5;
+    ctx.globalAlpha=ki===keys.length-1?1:0.7;
+    ctx.setLineDash(dashes&&dashes[ki]?dashes[ki]:[]);
+    ctx.beginPath();var st=false;
+    rows.forEach(function(r,ri){
+      if(r[k]==null)return;
+      if(!st){ctx.moveTo(xp(ri),yp(r[k]));st=true;}
+      else ctx.lineTo(xp(ri),yp(r[k]));
+    });
+    ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  });
+  ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';
+  rows.forEach(function(r,ri){if(ri%5===0)ctx.fillText(r.age,xp(ri)-6,H-4);});
+}
+ 
+function drawBar(id,rows,keys,cols){
+  var cv=document.getElementById(id);if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.offsetWidth,H=cv.height=180;
+  ctx.clearRect(0,0,W,H);
+  var pd={t:12,r:14,b:26,l:66};
+  var cW=W-pd.l-pd.r,cH=H-pd.t-pd.b;
+  var mx=0;
+  rows.forEach(function(r){var s=0;keys.forEach(function(k){s+=(r[k]||0);});s+=(r.shortfall||0);if(s>mx)mx=s;});
+  if(!mx)mx=1;
+  var bW=cW/rows.length,gap=0.5;
+  ctx.strokeStyle='rgba(0,0,0,0.05)';
+  for(var i=0;i<=4;i++){
+    var y=pd.t+cH-(cH*i/4);
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';ctx.fillText(fmt(mx*i/4),2,y+3);
+  }
+  rows.forEach(function(r,ri){
+    var x=pd.l+ri*bW+gap/2,by=pd.t+cH;
+    if(r.shock&&r.shock<0){ctx.fillStyle='rgba(185,28,28,0.07)';ctx.fillRect(x,pd.t,bW-gap,cH);}
+    keys.forEach(function(k,ki){var v=r[k]||0,bh=v/mx*cH;if(bh>0){ctx.fillStyle=cols[ki];ctx.fillRect(x,by-bh,bW-gap,bh);by-=bh;}});
+    if(r.shortfall>0){var sh=r.shortfall/mx*cH;ctx.fillStyle='rgba(185,28,28,0.4)';ctx.fillRect(x,by-sh,bW-gap,sh);}
+    if(ri%5===0){ctx.fillStyle='rgba(0,0,0,0.35)';ctx.font='9px sans-serif';ctx.fillText(r.age,pd.l+ri*bW+bW/2-6,H-4);}
+  });
+}
+ 
+/*** ===========================
+     Shock UI
+==============================*/
+function renderShockList(){
+  var el=document.getElementById('shockList');el.innerHTML='';
+  shocks.forEach(function(s,i){
+    var row=document.createElement('div');
+    row.className='shock-row-input';
+    row.style.display='flex';row.style.gap='6px';row.style.alignItems='center';row.style.marginBottom='6px';
+    row.innerHTML='<div style="flex:1"><div style="font-size:10px;color:var(--ink4);margin-bottom:2px">Year '+s.yr+' (age '+(g('sa')+s.yr-1)+') — '+s.fall+'% fall</div>'
+      +'<input type="range" min="1" max="'+g('ty')+'" value="'+s.yr+'" style="width:100%;accent-color:#B91C1C" oninput="shocks['+i+'].yr=+this.value;renderShockList()"></div>'
+      +'<div style="width:75px"><input type="number" value="'+s.fall+'" min="-70" max="-5" step="5" style="width:100%" oninput="shocks['+i+'].fall=+this.value;renderShockList()"></div>'
+      +'<div class="shock-del" onclick="shocks.splice('+i+',1);renderShockList()">&#215;</div>';
+    el.appendChild(row);
+  });
+}
+function addShock(){if(shocks.length>=4)return;shocks.push({yr:5,fall:-30});renderShockList();}
+function loadPreset(name){
+  var presets={covid:[{yr:5,fall:-33}],gfc:[{yr:3,fall:-45}],dotcom:[{yr:2,fall:-40}],double:[{yr:3,fall:-25},{yr:8,fall:-25}]};
+  shocks=presets[name]||[];renderShockList();
+}
+renderShockList();
+ 
+/*** ===========================
+     Core Model Helpers
+==============================*/
+// Personal Allowance taper (England/Wales/NI style)
+function personalAllowanceFor(adjustedNetIncome){
+  var PA=12570;
+  if(adjustedNetIncome<=100000) return PA;
+  var red=Math.floor((adjustedNetIncome-100000)/2);
+  return Math.max(0,PA-red);
+}
+ 
+// Dividend banded rate (simplified thresholds)
+function dividendRateFor(taxableIncomeAfterPA){ // excludes dividend allowance
+  // Basic band ~ £37,700 after PA (assuming standard banding)
+  var basicBand=37700;
+  if(taxableIncomeAfterPA<=basicBand) return 0.0875;
+  if(taxableIncomeAfterPA<=125140-12570) return 0.3375; // higher to top threshold after PA
+  return 0.3935;
+}
+ 
+// CGT rate selection (approximation)
+function cgtRateFor(taxableIncomeAfterPA){
+  // Non-residential assets
+  var basicBand=37700;
+  return (taxableIncomeAfterPA<=basicBand)?0.18:0.24;
+}
+ 
+// RNRB taper
+function rnrbTapered(rnrb, estateValue){
+  var thresh=2000000;
+  if(estateValue<=thresh) return rnrb;
+  var reduction=Math.floor((estateValue-thresh)/2);
+  return Math.max(0,rnrb-reduction);
+}
+ 
+/*** ===========================
+     GIA (Units & Lots) for FIFO-like gains
+==============================*/
+function createGIAEngine(startValue,startCost){
+  // Use a unit price model. Start with price=1, units = startValue/1.
+  // Average initial cost per unit = startCost/units; we track remaining cost via lots.
+  var price=1;
+  var units=startValue/price;
+  var lots=[{units:units,cpu:(startCost/units)}]; // cpu = cost per unit
+ 
+  function grow(rate){price*= (1+rate);}
+ 
+  function value(){return units*price;}
+ 
+  function sell(amount){ // amount is £ gross proceeds
+    var toSellUnits=amount/price;
+    var realisedGain=0, realisedCost=0, sold=0;
+    // FIFO from lots
+    var need=toSellUnits;
+    for(var i=0;i<lots.length && need>1e-10;i++){
+      var take=Math.min(lots[i].units,need);
+      realisedCost += take*lots[i].cpu;
+      sold += take;
+      lots[i].units -= take;
+      need -= take;
+    }
+    // prune zero lots
+    lots=lots.filter(L=>L.units>1e-12);
+    units -= sold;
+    var proceeds = sold*price;
+    realisedGain = proceeds - realisedCost;
+    return {proceeds:proceeds, gain:Math.max(0,realisedGain), cost:realisedCost, unitsSold:sold};
+  }
+ 
+  function buy(amount){ // re-investment if needed (not used here)
+    var addUnits=amount/price;
+    lots.push({units:addUnits,cpu:amount/addUnits});
+    units+=addUnits;
+  }
+ 
+  return {grow,value,sell,buy,get price(){return price;},get units(){return units;}};
+}
+ 
+/*** ===========================
+     Strategy Engine
+==============================*/
+function runStrategy(p,strat,shockMap,growthOverride){
+  // Apply net growth after fees per wrapper
+  var PG=(growthOverride!=null?growthOverride:p.pg)-p.fees;
+  var IG=(growthOverride!=null?growthOverride:p.ig)-p.fees;
+  var GG=(growthOverride!=null?growthOverride:p.gg)-p.fees;
+  var OBG=(growthOverride!=null?growthOverride:p.obg)-p.fees;
+ 
+  var cYr=p.ca-p.sa+1;
+ 
+  // Starting balances (net of immediate PCLS)
+  var pB=Math.max(0,p.pension-p.pcls),
+      iB=p.isa,
+      obB=p.ob;
+ 
+  // GIA Engine
+  var giaEng=createGIAEngine(p.gia, Math.min(p.giaCost,p.gia));
+  var gB=giaEng.value();
+ 
+  var annuityIncome=0,annuityBought=false;
+ 
+  var totTax=0,totShortfall=0,depleted=false,depAge=null;
+  var rows=[];
+  var divBase=p.divAmt;
+ 
+  // Offshore Bond 5% rule state
+  var obPrem=p.ob, obCumAllow=0, obUsedAllow=0; // cum allow increases 5% p.a. up to 100% of premium
+ 
+  for(var yr=1;yr<=p.ty;yr++){
+    var age=p.sa+yr-1;
+    var ph=yr>=cYr?2:1;
+    var taxRate=(ph===2?p.t2:p.t1);
+    var inf=(ph===2?p.i2:p.i1);
+    var phYr=(ph===2?yr-cYr+1:yr);
+    var tns=(ph===2?p.sp2:p.sp1)*Math.pow(1+inf,phYr-1);
+ 
+    // Apply market shock as level shift at start of year
+    if(shockMap&&shockMap[yr]){
+      var sf=1+shockMap[yr]/100;
+      pB*=sf;iB*=sf;obB*=sf;
+      // For GIA units, scale price to apply level shift
+      giaEng.__shock = true;
+      giaEng.__price = giaEng.price * sf; // adjust internal (hacky)
+      // patch: reassign price if we used hidden field
+      if(giaEng.__shock){Object.defineProperty(giaEng,"price",{get:()=>giaEng.__price});}
+      gB=giaEng.value();
+    }
+ 
+    // Annuity purchase from pension
+    if(p.annuityOn && !annuityBought && age>=p.annuityAge && pB>=p.annuityPot){
+      pB-=p.annuityPot;
+      annuityIncome=p.annuityPot*p.annuityRate;
+      annuityBought=true;
+    }
+ 
+    // Incomes (gross or net per modelling notes)
+    var spG=age>=p.spAge?p.spAmt*Math.pow(1+p.spIdx,age-p.spAge):0;
+    var dbG=age>=p.dbAge?p.dbAmt*Math.pow(1+p.dbIdx,age-p.dbAge):0;
+    var annG=annuityBought?annuityIncome:0;
+ 
+    // Rental & Trust (NET)
+    var rEnd=p.rentalEnd>0?p.rentalEnd:9999;
+    var rentalG=(p.rental>0 && age>=p.rentalAge && age<rEnd)?p.rental*Math.pow(1+p.rentalIdx,Math.max(0,age-p.rentalAge)):0;
+    var tEnd=p.trustEnd>0?p.trustEnd:9999;
+    var trustG=(p.trust>0 && age>=p.trustAge && age<tEnd)?p.trust*Math.pow(1+p.trustIdx,Math.max(0,age-p.trustAge)):0;
+ 
+    // Dividends (gross)
+    var divG=divBase*Math.pow(1+p.divGrowth,yr-1);
+ 
+    // Cumulative OB allowance accrues this year
+    obCumAllow = Math.min(obPrem, obCumAllow + obPrem*0.05);
+    var obAvailAllow = Math.max(0, obCumAllow - obUsedAllow);
+ 
+    // Determine net spending gap after net incomes:
+    // Note: spG, dbG, annG are *gross* taxable; rentalG & trustG are *net*; dividends are *gross* taxable at dividend rates.
+    var netGuaranteed = rentalG + trustG; // net already
+    // Dividends net not known yet; tax computed later. We'll treat dividends as reducing net need by their NET (after dividend tax).
+    // But for sequencing, we first plan withdrawals ignoring dividend effect, then compute tax and adjust balances.
+ 
+    // We'll allocate capital withdrawals to meet the net target excluding dividend net impact for now:
+    var extGrossTaxable = spG + dbG + annG; // non-div gross
+    var needed = Math.max(0, tns - (netGuaranteed)); // dividends handled later via tax and net add-back in display
+ 
+    // DRAW ORDER STRATEGY
+    var fp=0, fi=0, fgia=0, fob=0, fobAllowUsed=0, fobTaxableUsed=0;
+    var taxP=0;
+    var notes=[];
+ 
+    if(!depleted){
+      // 1) Pension up to available PA (0% tax) — only as needed
+      // Compute a provisional adjusted net income base to derive PA:
+      // Approximation: use last year's info not available; we base on current year's gross flows if we were to use none from pension yet.
+      // We'll assign PA after we decide actual taxable flows; to avoid circularity we cap initial PA draw to a max of PA anyway.
+      var tentativeANI = extGrossTaxable + Math.max(0, divG - 500); // top-slice approx
+      var PA = personalAllowanceFor(tentativeANI);
+      var paDrawGrossCap = Math.min(PA, pB); // 0% tax draw cap
+      fp = Math.min(paDrawGrossCap, needed); // only take what is needed
+      needed -= fp;
+ 
+      // 2) Offshore Bond — use available 5% allowance (net, tax-deferred)
+      if(needed>0 && obB>0 && obAvailAllow>0){
+        var take = Math.min(needed, obAvailAllow, obB);
+        fob += take; fobAllowUsed += take; obUsedAllow += take;
+        needed -= take;
+      }
+ 
+      // 3) ISA (net)
+      if(needed>0 && iB>0){
+        var take=Math.min(iB,needed); fi+=take; needed-=take;
+      }
+ 
+      // 4) GIA (net of CGT on realised gains; we sell gross now, tax later)
+      if(needed>0 && gB>0){
+        var take=Math.min(gB,needed);
+        fgia+=take; needed-=take;
+      }
+ 
+      // 5) Pension top-up (taxable at P1/P2)
+      if(needed>0 && pB-fp>0){
+        var grossNeeded = needed/(1 - taxRate);
+        var take = Math.min(pB-fp, grossNeeded);
+        fp += take; needed -= take*(1 - taxRate);
+      }
+ 
+      // 6) Offshore Bond taxable (if still short)
+      if(needed>0 && obB>fob){
+        var gross = needed/(1 - taxRate);
+        var take = Math.min(obB-fob, gross);
+        fob += take; fobTaxableUsed += take; needed -= take*(1 - taxRate);
+      }
+ 
+      // After draw, grow wrappers
+      // Apply tax later after computing proper bands/div/CGT
+      pB = Math.max(0, pB - fp) * (1 + PG);
+      iB = Math.max(0, iB - fi) * (1 + IG);
+ 
+      // GIA: execute the sale to know realised gains for CGT
+      var giaGainRealised=0, giaSellProceeds=0;
+      if(fgia>0){
+        var sold=giaEng.sell(fgia);
+        giaGainRealised = sold.gain;
+        giaSellProceeds = sold.proceeds;
+      }
+      // Grow remaining GIA
+      giaEng.grow(GG);
+      gB = giaEng.value();
+ 
+      // OB: simply reduce by total OB withdrawals (allow + taxable) and grow
+      if(fob>0){ obB = Math.max(0, obB - fob); }
+      obB = obB*(1+OBG);
+ 
+      // ==== TAX CALCULATION (approximation) ====
+      // Non-div taxable gross (before PA) includes: spG + dbG + taxable part of pension (fp beyond PA draw) + annG + taxable OB (fobTaxableUsed)
+      // But we already pulled fp including PA and taxable; Determine split:
+      var fpTaxable = Math.max(0, fp - Math.min(fp, PA)); // if fp used part of PA, that part is 0% (we approximated earlier)
+      // However PA might be used also by SP/DB/Annuity. Recompute more correctly:
+ 
+      // Recompute ANI base including taxable candidates (not perfect, but good proxy)
+      var grossNonDiv = spG + dbG + annG + fobTaxableUsed + fp; // all pension draw counts gross; PA applied below
+      // Total gross for PA interaction (dividends use top-slice, but PA can be used here first)
+      var aniBase = grossNonDiv + Math.max(0, divG - 500); // rough top-slice estimation
+      var PA2 = personalAllowanceFor(aniBase);
+ 
+      // Apply PA to non-div first:
+      var nonDivBeforePA = spG + dbG + annG + fobTaxableUsed + fp;
+      var nonDivAfterPA = Math.max(0, nonDivBeforePA - PA2);
+      var PAUsed = Math.max(0, Math.min(PA2, nonDivBeforePA));
+ 
+      // Income tax on non-div @ phase rate:
+      var incomeTaxNonDiv = nonDivAfterPA * taxRate;
+ 
+      // Dividend tax: allowance £500
+      var divAllow = 500;
+      var divTaxable = Math.max(0, divG - divAllow);
+      // Determine band position using nonDivAfterPA as taxable income base
+      var taxableIncomeForBands = nonDivAfterPA;
+      var dRate = dividendRateFor(taxableIncomeForBands);
+      var divTax = divTaxable * dRate;
+      var divNet = divG - divTax;
+ 
+      // CGT: AEA £3,000; apply 18%/24% approx based on taxableIncomeForBands
+      var cgtAEA = 3000;
+      var cgtTaxableGains = Math.max(0, giaGainRealised - cgtAEA);
+      var cgtRate = cgtRateFor(taxableIncomeForBands);
+      var cgt = cgtTaxableGains * cgtRate;
+ 
+      taxP = incomeTaxNonDiv + divTax + cgt;
+ 
+      // Tally tax & shortfall
+      totTax += taxP;
+ 
+      // Depletion test
+      if(pB<=0 && iB<=0 && gB<=0 && obB<=0 && !depleted){depleted=true;depAge=age;}
+    }else{
+      // depleted already
+      pB=0;iB=0;gB=0;obB=0;
+    }
+ 
+    // Shortfall if depleted
+    var total=pB+iB+gB+obB;
+    var shortfall=depleted && (tns - (rentalG+trustG))>0 ? (tns - (rentalG+trustG)) : 0;
+    totShortfall+=shortfall;
+ 
+    rows.push({
+      age,ph,tns,
+      spN:spG*(1-taxRate), dbN:dbG*(1-taxRate), // shown as "net" just for display consistency
+      rentalG, trustG, annG:annG*(1-taxRate), // annuity treated like other earned income for display; net here
+      divN: (typeof divNet!=='undefined'?divNet:0),
+      extIncome: (spG*(1-taxRate))+(dbG*(1-taxRate))+rentalG+trustG+(annG*(1-taxRate))+(typeof divNet!=='undefined'?divNet:0),
+      needed:Math.max(0,tns-(rentalG+trustG)),
+ 
+      fp:fp, fi:fi, fg:fgia, fob:fob,
+      obAllowUsed: fobAllowUsed, obAllowAvail: Math.max(0, obCumAllow - obUsedAllow),
+      taxP:taxP,
+      pB:pB,iB:iB,gB:gB,obB:obB,total:total,
+      shortfall:shortfall,depleted:depleted,
+      shock:shockMap&&shockMap[yr]?shockMap[yr]:0,
+      grossIncome:(spG+dbG+annG+fobTaxableUsed+fp)+divG // display gross (non-div taxable + dividends)
+    });
+  }
+ 
+  return{rows,totTax,totShortfall,final:pB+iB+gB+obB,depAge};
+}
+ 
+/*** ===========================
+     Run All & Build Outputs
+==============================*/
+function runAll(){
+  var p=getParams(); lastP=p;
+ 
+  var shockMap={}; shocks.forEach(function(s){shockMap[s.yr]=(shockMap[s.yr]||0)+s.fall;});
+ 
+  var pf=runStrategy(p,'pension',null,null);
+  var if_=runStrategy(p,'isa',null,null);
+  var ob_=runStrategy(p,'offshore',null,null);
+  var bl=runStrategy(p,'blended',null,null);
+  var bl_shock=runStrategy(p,'blended',shockMap,null);
+ 
+  lastBl=bl; lastPf=pf; lastIf_=if_; lastOb_=ob_;
+ 
+  var saving=pf.totTax-bl.totTax;
+  var cmpRows=[];
+  for(var i=0;i<p.ty;i++){
+    cmpRows.push({
+      age:p.sa+i,
+      pf:pf.rows[i]?pf.rows[i].total:0,
+      'if':if_.rows[i]?if_.rows[i].total:0,
+      ob:ob_.rows[i]?ob_.rows[i].total:0,
+      bl:bl.rows[i]?bl.rows[i].total:0,
+      shock:shockMap[i+1]||0
+    });
+  }
+ 
+  var html='';
+  html+='<div class="banner" style="background:var(--forest-bg);border-color:var(--forest-bdr);border-left-color:var(--forest)">';
+  html+='<div style="font-size:20px;margin-top:1px">&#10003;</div><div>';
+  html+='<div class="banner-title" style="color:var(--forest)">Optimal Strategy: Blended — Saving '+ffz(saving)+' vs pension-first</div>';
+  html+='<div class="banner-body">';
+  html+='Pension First: <strong style="color:var(--err)">'+ffz(pf.totTax)+'</strong> tax';
+  html+=' &nbsp;&middot;&nbsp; ISA First: <strong style="color:var(--steel)">'+ffz(if_.totTax)+'</strong>';
+  html+=' &nbsp;&middot;&nbsp; Offshore First: <strong style="color:var(--sage)">'+ffz(ob_.totTax)+'</strong>';
+  html+=' &nbsp;&middot;&nbsp; Blended: <strong style="color:var(--forest)">'+ffz(bl.totTax)+'</strong>';
+  if(bl.totShortfall>0)html+='<br><strong style="color:var(--err)">&nbsp;&#9888; Total cumulative shortfall: '+ffz(bl.totShortfall)+'</strong>';
+  html+='</div></div></div>';
+ 
+  var strats=[
+    {lb:'Pension First',sr:pf,top:'#8C9BB5',c:'#8C9BB5'},
+    {lb:'ISA First',sr:if_,top:C.ob,c:C.ob},
+    {lb:'Offshore First',sr:ob_,top:C.sage,c:C.sage},
+    {lb:'Blended &#9733;',sr:bl,top:C.pension,c:C.pension}
+  ];
+  html+='<div class="kpi-grid">';
+  strats.forEach(function(s){
+    html+='<div class="kpi-card" style="border-top-color:'+s.top+'">';
+    html+='<div class="kpi-lbl" style="color:'+s.c+'">'+s.lb+'</div>';
+    html+='<div class="kpi-v" style="color:'+(s.sr.final>0?s.c:'var(--err)')+'">'+fmt(s.sr.final)+'</div>';
+    html+='<div class="kpi-note">Final fund</div>';
+    html+='<div style="margin-top:8px"><div class="kpi-lbl">Tax paid</div>';
+    html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:14px;color:var(--err)">'+ffz(s.sr.totTax)+'</div></div>';
+    html+='<div style="margin-top:6px"><div class="kpi-lbl">Lasts to</div>';
+    html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:13px;color:'+(s.sr.depAge?'var(--err)':s.c)+'">'+(s.sr.depAge?'Age '+s.sr.depAge:'No depletion')+'</div></div>';
+    if(s.sr.totShortfall>0){html+='<div style="margin-top:6px"><div class="kpi-lbl">Shortfall</div><div style="font-family:\'Source Code Pro\',monospace;font-size:12px;color:var(--err)">'+ffz(s.sr.totShortfall)+'</div></div>';}
+    html+='</div>';
+  });
+  html+='</div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Portfolio Value — All Strategies</span>';
+  html+='<div class="leg"><span class="leg-item"><span class="leg-dot" style="background:#8C9BB5"></span>Pension</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.ob+'"></span>ISA</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.sage+'"></span>Offshore</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.pension+'"></span>Blended</span></div></div>';
+  html+='<div class="rpanel-bd"><canvas id="lineChart" style="width:100%;display:block"></canvas></div></div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Income Sources — Blended</span>';
+  html+='<div class="leg">';
+  var legItems=[['Pension',C.pension],['ISA',C.isa],['GIA',C.gia],['Offshore',C.ob],['State Pen',C.sp],['DB',C.db],['Rental',C.rental],['Trust',C.trust],['Annuity',C.annuity],['Dividends',C.div],['Shortfall','rgba(185,28,28,.4)']];
+  legItems.forEach(function(li){html+='<span class="leg-item"><span class="leg-dot" style="background:'+li[1]+'"></span>'+li[0]+'</span>';});
+  html+='</div></div><div class="rpanel-bd"><canvas id="barChart" style="width:100%;display:block"></canvas></div></div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Year-by-Year — Blended Strategy</span>';
+  html+='<span style="font-size:10px;color:var(--err);font-weight:600">&#9888; Red = depleted · Orange = shock year</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  var hdrs=[{t:'Age',L:true},{t:'Ph',L:true},{t:'Target'},{t:'State Pen',c:C.sp},{t:'DB',c:C.db},
+    {t:'Rental',c:C.rental},{t:'Divs',c:C.div},{t:'Annuity',c:C.annuity},
+    {t:'Pension',c:C.pension},{t:'ISA',c:C.isa},{t:'GIA',c:C.gia},{t:'Offshore',c:C.ob},
+    {t:'OB Allow (used/avail)'},{t:'Tax',c:'#B91C1C'},{t:'Fund Total'},{t:'Shortfall',c:'#B91C1C'}];
+  hdrs.forEach(function(h){html+='<th'+(h.L?' class="L"':'')+' style="'+(h.c?'color:'+h.c:'')+'">' +h.t+'</th>';});
+  html+='</tr></thead><tbody>';
+ 
+  bl.rows.forEach(function(row){
+    var dep=row.depleted,shk=row.shock<0;
+    var cls=dep?' class="depl-row"':shk?' class="shock-row"':'';
+    var phB=row.ph===1
+      ?'<span class="badge" style="background:rgba(28,63,122,.08);color:#1C3F7A;border:1px solid rgba(28,63,122,.2)">P1</span>'
+      :'<span class="badge" style="background:rgba(185,28,28,.07);color:#B91C1C;border:1px solid rgba(185,28,28,.2)">P2</span>';
+    var fundCol=row.total<=0?'#B91C1C':row.total<30000?'#B45309':'var(--ink)';
+    var obAllowCell = '<span style="color:'+C.steel+';font-weight:600">'+ffz(row.obAllowUsed)+'</span>'
+                    +' / <span style="color:'+C.steel+'">'+ffz(row.obAllowAvail)+'</span>';
+    html+='<tr'+cls+'>';
+    html+='<td class="L" style="color:'+(dep?'#B91C1C':shk?'#B45309':'var(--ink)')+(shk?';font-weight:700':'')+'">'+(shk?'&#9889; ':'')+row.age+'</td>';
+    html+='<td class="L">'+phB+'</td>';
+    html+='<td>'+ffz(row.tns)+'</td>';
+    html+='<td style="color:'+C.sp+'">'+ffz(row.spN)+'</td>';
+    html+='<td style="color:'+C.db+'">'+ffz(row.dbN)+'</td>';
+    html+='<td style="color:'+C.rental+'">'+ffz(row.rentalG)+'</td>';
+    html+='<td style="color:'+C.div+'">'+ffz(row.divN)+'</td>';
+    html+='<td style="color:'+C.annuity+'">'+ffz(row.annG)+'</td>';
+    html+='<td style="color:'+C.pension+'">'+ff(row.fp)+'</td>';
+    html+='<td style="color:'+C.isa+'">'+ff(row.fi)+'</td>';
+    html+='<td style="color:'+C.gia+'">'+ff(row.fg)+'</td>';
+    html+='<td style="color:'+C.ob+'">'+ff(row.fob)+'</td>';
+    html+='<td style="text-align:center">'+obAllowCell+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:600">'+ff(row.taxP)+'</td>';
+    html+='<td style="color:'+fundCol+';font-weight:700">'+ffz(row.total)+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:700">'+(row.shortfall>0?ffz(row.shortfall):'&mdash;')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+ 
+  html+='<div class="insight"><div style="font-size:14px;margin-top:2px;color:var(--royal)">&#9432;</div>';
+  html+='<div class="insight-body"><strong style="color:var(--royal)">Blended Sequencing</strong><br>';
+  html+='Pension to personal allowance (0% tax) → OB 5% allowance → ISA → GIA (CGT) → Pension/OB taxable top-up. ';
+  html+='DB, state pension, annuity, rental, trust and dividends all reduce capital draw each year.<br>';
+  html+='<strong style="color:#B91C1C">Post-depletion:</strong> model continues to age '+(p.sa+p.ty-1)+' showing annual shortfall.</div></div>';
+ 
+  document.getElementById('results').innerHTML=html;
+  setTimeout(function(){
+    drawLine('lineChart',cmpRows,['pf','if','ob','bl'],[C.pfLine,C.isaLine,C.obLine,C.blLine],[[5,4],[4,3],[3,2],[]],null);
+    drawBar('barChart',bl.rows,['fp','fi','fg','fob','spN','dbN','rentalG','trustG','annG','divN'],
+      [C.pension,C.isa,C.gia,C.ob,C.sp,C.db,C.rental,C.trust,C.annuity,C.div]);
+  },60);
+ 
+  buildShockResults(p,pf,if_,ob_,bl,bl_shock,shockMap);
+  buildStressResults(p);
+  buildTaxResults(p,bl);
+}
+ 
+/*** ===========================
+     Shock Results
+==============================*/
+function buildShockResults(p,pf,if_,ob_,bl,bl_shock,shockMap){
+  if(Object.keys(shockMap).length===0){
+    document.getElementById('shockResults').innerHTML='<div class="rpanel"><div class="empty"><div class="empty-icon">&#9889;</div><div class="empty-title">No Shocks Defined</div><div class="empty-body">Add shock events on the left panel to see impact analysis.</div></div></div>';
+    return;
+  }
+  var pf_s=runStrategy(p,'pension',shockMap,null);
+  var if_s=runStrategy(p,'isa',shockMap,null);
+  var ob_s=runStrategy(p,'offshore',shockMap,null);
+ 
+  var shockDesc=shocks.map(function(s){return s.fall+'% in year '+s.yr+' (age '+(p.sa+s.yr-1)+')';}).join(', ');
+ 
+  var html='';
+  html+='<div class="banner" style="background:rgba(185,28,28,.05);border-color:rgba(185,28,28,.2);border-left-color:#B91C1C">';
+  html+='<div style="font-size:20px">&#9889;</div><div>';
+  html+='<div class="banner-title" style="color:#B91C1C">Market Shock: '+shockDesc+'</div>';
+  html+='<div class="banner-body">';
+  html+='Blended fund impact vs base: <strong style="color:#B91C1C">'+ffz(bl_shock.final-bl.final)+'</strong>';
+  html+=' &nbsp;&middot;&nbsp; Additional shortfall: <strong style="color:#B91C1C)">'+ffz(bl_shock.totShortfall-bl.totShortfall)+'</strong>';
+  html+='</div></div></div>';
+ 
+  html+='<div class="scenario-grid">';
+  var ss=[
+    {lb:'Pension First (shocked)',sr:pf_s,base:pf,c:'#8C9BB5'},
+    {lb:'Blended (base)',sr:bl,base:bl,c:C.pension},
+    {lb:'Blended (shocked)',sr:bl_shock,base:bl,c:C.err}
+  ];
+  ss.forEach(function(s){
+    var diff=s.sr!==s.base?s.sr.final-s.base.final:null;
+    html+='<div class="scenario-card" style="background:var(--bg2);border-color:var(--border)">';
+    html+='<div class="scenario-title" style="color:var(--ink)">'+s.lb+'</div>';
+    html+='<div class="scenario-stat"><div class="scenario-stat-lbl">Final Fund</div>';
+    html+='<div class="scenario-stat-val" style="color:'+(s.sr.final>0?s.c:'#B91C1C')+'">'+fmt(s.sr.final)+'</div></div>';
+    if(diff!==null){html+='<div class="scenario-stat"><div class="scenario-stat-lbl">Shock Impact</div><div class="scenario-stat-val" style="color:#B91C1C">'+ffz(diff)+'</div></div>';}
+    html+='<div class="scenario-stat"><div class="scenario-stat-lbl">Fund Lasts To</div>';
+    html+='<div class="scenario-stat-val" style="color:'+(s.sr.depAge?'#B91C1C':s.c)+'">'+(s.sr.depAge?'Age '+s.sr.depAge:'No depletion')+'</div></div>';
+    html+='</div>';
+  });
+  html+='</div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Base vs Shocked — Blended Strategy</span></div>';
+  html+='<div class="rpanel-bd"><canvas id="shockLineChart" style="width:100%;display:block"></canvas>';
+  html+='<div class="band-note">&#9889; Vertical shading marks shock years. Dashed red = shocked scenario.</div></div></div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Year-by-Year: Base vs Shocked</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  html+='<th class="L">Age</th><th>Base Fund</th><th>Shocked Fund</th><th>Difference</th><th>Shocked Shortfall</th></tr></thead><tbody>';
+  bl.rows.forEach(function(row,i){
+    var sr=bl_shock.rows[i]; var diff=sr.total-row.total; var shk=shockMap[i+1]<0;
+    html+='<tr'+(shk?' class="shock-row"':'')+'>';
+    html+='<td class="L">'+(shk?'&#9889; ':'')+row.age+'</td>';
+    html+='<td style="font-weight:700;color:var(--ink)">'+ffz(row.total)+'</td>';
+    html+='<td style="font-weight:700;color:'+(sr.total<row.total?'#B91C1C':'#166534')+'">'+ffz(sr.total)+'</td>';
+    html+='<td style="color:#B91C1C">'+ffz(diff)+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:700">'+(sr.shortfall>0?ffz(sr.shortfall):'&mdash;')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+ 
+  document.getElementById('shockResults').innerHTML=html;
+  setTimeout(function(){
+    var blBase=[]; bl.rows.forEach(function(r,i){blBase.push({age:r.age,bl:r.total,blShock:bl_shock.rows[i].total,shock:shockMap[i+1]||0});});
+    drawLine('shockLineChart',blBase,['bl','blShock'],[C.pension,'#B91C1C'],[[],[4,3]],null);
+  },60);
+}
+ 
+/*** ===========================
+     Stress Results (unchanged scenarios; now references new engine)
+==============================*/
+function buildStressResults(p){
+  var scenarios=[
+    {lb:'Base Case',inf1:p.i1,inf2:p.i2,gr:p.pg,color:C.forest},
+    {lb:'High Inflation (6%/8%)',inf1:0.06,inf2:0.08,gr:p.pg,color:C.amber},
+    {lb:'Low Returns (2%)',inf1:p.i1,inf2:p.i2,gr:0.02,color:'#B45309'},
+    {lb:'Stagflation (5%inf/2%gr)',inf1:0.05,inf2:0.07,gr:0.02,color:C.err},
+    {lb:'Long Life to Age 100',inf1:p.i1,inf2:p.i2,gr:p.pg,extra:15,color:C.steel},
+    {lb:'Best Case (7%gr/1.5%inf)',inf1:0.015,inf2:0.025,gr:0.07,color:C.royal||C.pension}
+  ];
+  var results=scenarios.map(function(sc){
+    var sp={}; for(var k in p)sp[k]=p[k];
+    sp.i1=sc.inf1; sp.i2=sc.inf2; sp.pg=sc.gr; sp.ig=sc.gr; sp.gg=sc.gr*0.9;
+    if(sc.extra) sp.ty=p.ty+sc.extra;
+    var r=runStrategy(sp,'blended',null,null);
+    return{lb:sc.lb,color:sc.color,inf1:sc.inf1,inf2:sc.inf2,gr:sc.gr,final:r.final,totTax:r.totTax,totShortfall:r.totShortfall,depAge:r.depAge,rows:r.rows};
+  });
+ 
+  var html='<div class="kpi-grid-5">';
+  for(var i=0;i<5;i++){
+    var r=results[i];
+    html+='<div class="kpi-card" style="border-top-color:'+r.color+'">';
+    html+='<div class="kpi-lbl" style="color:'+r.color+'">'+r.lb+'</div>';
+    html+='<div class="kpi-v" style="font-size:14px;color:'+(r.final>0?r.color:'#B91C1C')+'">'+fmt(r.final)+'</div>';
+    html+='<div class="kpi-note">Final fund (blended)</div>';
+    html+='<div style="margin-top:6px"><div class="kpi-lbl">Tax paid</div><div style="font-family:\'Source Code Pro\',monospace;font-size:12px;color:#B91C1C">'+ffz(r.totTax)+'</div></div>';
+    html+='<div style="margin-top:5px"><div class="kpi-lbl">Lasts to</div><div style="font-family:\'Source Code Pro\',monospace;font-size:12px;color:'+(r.depAge?'#B91C1C':r.color)+'">'+(r.depAge?'Age '+r.depAge:'Survives')+'</div></div>';
+    if(r.totShortfall>0){html+='<div style="margin-top:5px"><div class="kpi-lbl">Shortfall</div><div style="font-family:\'Source Code Pro\',monospace;font-size:11px;color:#B91C1C">'+ffz(r.totShortfall)+'</div></div>';}
+    html+='</div>';
+  }
+  html+='</div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Scenario Comparison Table</span></div>';
+  html+='<div class="tbl-wrap"><table><thead><tr>';
+  html+='<th class="L">Scenario</th><th>Inflation P1</th><th>Inflation P2</th><th>Growth</th><th>Final Fund</th><th>Tax Paid</th><th>Lasts To</th><th>Shortfall</th></tr></thead><tbody>';
+  results.forEach(function(r){
+    html+='<tr>';
+    html+='<td class="L" style="font-weight:700;color:'+r.color+'">'+r.lb+'</td>';
+    html+='<td>'+ (r.inf1*100).toFixed(1)+'%</td>';
+    html+='<td>'+ (r.inf2*100).toFixed(1)+'%</td>';
+    html+='<td>'+ (r.gr*100).toFixed(1)+'%</td>';
+    html+='<td style="font-weight:700;color:'+(r.final>0?r.color:'#B91C1C')+'">'+fmt(r.final)+'</td>';
+    html+='<td style="color:#B91C1C">'+ffz(r.totTax)+'</td>';
+    html+='<td style="color:'+(r.depAge?'#B91C1C':r.color)+'">'+(r.depAge?'Age '+r.depAge:'No depletion')+'</td>';
+    html+='<td style="color:#B91C1C;font-weight:700">'+(r.totShortfall>0?ffz(r.totShortfall):'&mdash;')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+ 
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Fund Value Bands — Best / Base / Worst</span></div>';
+  html+='<div class="rpanel-bd"><canvas id="stressChart" style="width:100%;display:block"></canvas>';
+  html+='<div class="band-note">Green = best case · Red = worst case (stagflation) · Blue line = base case</div></div></div>';
+
+
  
 
-tps://www.canaccordgenuity.com (Disclaimer)
