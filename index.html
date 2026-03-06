@@ -1,74 +1,903 @@
-<div class="rpanel">
-    <div class="rpanel-hd">
-      <span class="rpanel-title">Year-by-Year Breakdown (Blended Strategy)</span>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Retirement Drawdown Planner — Canaccord Wealth</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  /* Royal blue foundation */
+  --royal:       #1C3F7A;
+  --royal-dk:    #142D5A;
+  --royal-md:    #2A52A0;
+  --royal-lt:    #3A6CC8;
+  --royal-bg:    rgba(28,63,122,0.06);
+  --royal-bdr:   rgba(28,63,122,0.18);
+
+  /* Professional greens */
+  --forest:      #1A5C3A;
+  --forest-bg:   rgba(26,92,58,0.06);
+  --forest-bdr:  rgba(26,92,58,0.18);
+  --fern:        #2E7D52;
+  --fern-bg:     rgba(46,125,82,0.06);
+  --fern-bdr:    rgba(46,125,82,0.18);
+  --sage:        #4A7C6F;
+  --sage-bg:     rgba(74,124,111,0.06);
+  --sage-bdr:    rgba(74,124,111,0.18);
+
+  /* Steel blues */
+  --steel:       #2C5F8A;
+  --steel-bg:    rgba(44,95,138,0.06);
+  --steel-bdr:   rgba(44,95,138,0.18);
+  --slate:       #3D6480;
+  --slate-bg:    rgba(61,100,128,0.06);
+  --slate-bdr:   rgba(61,100,128,0.18);
+
+  /* Neutral greys — proper financial tool neutrals */
+  --ink:         #1E2530;
+  --ink2:        #2E3645;
+  --ink3:        #4A5568;
+  --ink4:        #6B7A90;
+  --border:      #D8DDE6;
+  --border2:     #C4CBD8;
+  --bg:          #F4F6F9;
+  --bg2:         #EDF0F5;
+  --bg3:         #E2E7EF;
+  --white:       #FFFFFF;
+
+  /* Functional */
+  --err:         #B91C1C;
+  --err-bg:      rgba(185,28,28,0.05);
+  --warn:        #B45309;
+  --ok:          #166534;
+
+  /* Accent — muted steel-gold for KPI highlights only */
+  --accent:      #4A6FA5;
+
+  --shadow-sm:   0 1px 2px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04);
+  --shadow:      0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.06);
+  --r:           6px;
+  --r2:          10px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  font-family: 'Source Sans 3', sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.hdr {
+  background: var(--royal-dk);
+  border-bottom: 3px solid var(--royal-lt);
+  padding: 13px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.hdr-brand { display: flex; align-items: center; gap: 12px; }
+.hdr-logo {
+  width: 36px; height: 36px;
+  background: var(--royal-lt);
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Libre Baskerville', serif;
+  font-weight: 700; font-size: 15px; color: #fff;
+  letter-spacing: 0.5px;
+}
+.hdr-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 17px; font-weight: 700; color: #fff;
+  letter-spacing: -0.1px;
+}
+.hdr-sub {
+  font-size: 10.5px; font-weight: 400;
+  color: rgba(255,255,255,0.42);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  margin-top: 1px;
+}
+.hdr-tags { display: flex; gap: 5px; flex-wrap: wrap; }
+.tag {
+  padding: 3px 10px;
+  border-radius: 3px;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+  text-transform: uppercase;
+}
+
+/* ── LAYOUT ──────────────────────────────────────────────────── */
+.main {
+  max-width: 1500px;
+  margin: 0 auto;
+  padding: 18px 20px;
+  display: grid;
+  grid-template-columns: 305px 1fr;
+  gap: 16px;
+  align-items: start;
+}
+
+/* ── INPUT PANELS ────────────────────────────────────────────── */
+.panel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.panel-hd {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(to right, var(--bg), var(--bg2));
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-hd-icon {
+  width: 26px; height: 26px;
+  border-radius: 5px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  background: var(--royal-bg);
+}
+.panel-hd-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--royal);
+}
+.panel-bd { padding: 16px; }
+
+/* ── SOURCE BLOCKS ───────────────────────────────────────────── */
+.src {
+  border-radius: var(--r);
+  padding: 12px;
+  margin-bottom: 8px;
+  border: 1px solid;
+  border-left-width: 3px;
+}
+.src-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 3px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.src-desc {
+  font-size: 11px;
+  margin-bottom: 10px;
+  margin-top: 0;
+  color: var(--ink4);
+  font-style: italic;
+}
+
+/* ── FORM FIELDS ─────────────────────────────────────────────── */
+.fld { margin-bottom: 8px; }
+.fld label {
+  display: block;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink3);
+  margin-bottom: 3px;
+}
+.fld .wrap { position: relative; }
+.fld .pre {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px; color: var(--ink4);
+  pointer-events: none; z-index: 1; font-weight: 500;
+}
+.fld .suf {
+  position: absolute; right: 10px; top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px; color: var(--ink4);
+  pointer-events: none; font-weight: 500;
+}
+input[type=number] {
+  width: 100%;
+  padding: 7px 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  color: var(--ink);
+  font-size: 12.5px;
+  font-family: 'Source Code Pro', monospace;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s, background 0.12s;
+}
+input[type=number]:focus {
+  border-color: var(--royal-md);
+  box-shadow: 0 0 0 3px rgba(42,82,160,0.10);
+  background: var(--white);
+}
+input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
+.fld.pre input { padding-left: 22px; }
+.fld.suf input { padding-right: 28px; }
+.fr { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+.sl {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--royal);
+  margin: 12px 0 7px;
+  padding-bottom: 5px;
+  border-bottom: 1px solid var(--royal-bdr);
+}
+
+/* ── RUN BUTTON ──────────────────────────────────────────────── */
+.btn {
+  width: 100%;
+  padding: 11px 16px;
+  background: var(--royal);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 12px;
+  font-family: 'Source Sans 3', sans-serif;
+  letter-spacing: 0.03em;
+  transition: background 0.13s, box-shadow 0.13s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn:hover { background: var(--royal-md); box-shadow: 0 2px 8px rgba(28,63,122,0.25); }
+.btn:active { background: var(--royal-dk); }
+
+/* ── KPI GRID ────────────────────────────────────────────────── */
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.kpi-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-sm);
+  border-top: 3px solid;
+}
+.kpi-lbl {
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 5px;
+}
+.kpi-v {
+  font-family: 'Source Code Pro', monospace;
+  font-size: 19px;
+  font-weight: 500;
+  line-height: 1;
+  margin-bottom: 3px;
+}
+.kpi-note { font-size: 10.5px; color: var(--ink4); }
+
+/* ── BANNER ──────────────────────────────────────────────────── */
+.banner {
+  background: var(--forest-bg);
+  border: 1px solid var(--forest-bdr);
+  border-left: 3px solid var(--forest);
+  border-radius: var(--r2);
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  display: flex; gap: 12px; align-items: flex-start;
+}
+.banner-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 14px; font-weight: 700;
+  color: var(--forest);
+  margin-bottom: 4px;
+}
+.banner-body { font-size: 12.5px; line-height: 1.7; color: var(--ink2); }
+
+/* ── RESULT PANELS ───────────────────────────────────────────── */
+.rpanel {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+  overflow: hidden;
+}
+.rpanel-hd {
+  padding: 11px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 6px;
+}
+.rpanel-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 13px; font-weight: 700; color: var(--ink);
+}
+.rpanel-bd { padding: 14px; }
+
+/* ── TABLE ───────────────────────────────────────────────────── */
+.tbl-wrap { overflow-x: auto; max-height: 420px; overflow-y: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th {
+  background: var(--royal-dk);
+  color: rgba(255,255,255,0.8);
+  padding: 8px 10px;
+  text-align: right;
+  font-size: 9.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  position: sticky; top: 0;
+  white-space: nowrap;
+  font-family: 'Source Sans 3', sans-serif;
+}
+th.L { text-align: left; }
+td {
+  padding: 7px 10px;
+  text-align: right;
+  border-bottom: 1px solid var(--bg3);
+  font-family: 'Source Code Pro', monospace;
+  font-size: 11.5px;
+  color: var(--ink3);
+}
+td.L {
+  text-align: left;
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  font-size: 12.5px;
+  color: var(--ink);
+}
+tr:nth-child(even) td { background: rgba(244,246,249,0.5); }
+tr:hover td { background: rgba(28,63,122,0.03); }
+.depl-row td { background: rgba(185,28,28,0.04) !important; }
+.badge {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 3px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+/* ── LEGEND ──────────────────────────────────────────────────── */
+.leg { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
+.leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--ink3); font-weight: 500; }
+.leg-dot { width: 10px; height: 10px; border-radius: 2px; }
+
+/* ── INSIGHT ─────────────────────────────────────────────────── */
+.insight {
+  background: var(--royal-bg);
+  border: 1px solid var(--royal-bdr);
+  border-left: 3px solid var(--royal);
+  border-radius: var(--r2);
+  padding: 14px 16px;
+  display: flex; gap: 10px;
+  margin-bottom: 4px;
+}
+.insight-body { font-size: 12.5px; color: var(--ink2); line-height: 1.75; }
+
+/* ── EMPTY STATE ─────────────────────────────────────────────── */
+.empty { padding: 56px 40px; text-align: center; }
+.empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.25; }
+.empty-title {
+  font-family: 'Libre Baskerville', serif;
+  font-size: 19px; font-weight: 700;
+  color: var(--ink); margin-bottom: 10px;
+}
+.empty-body { font-size: 13px; color: var(--ink3); line-height: 1.85; max-width: 440px; margin: 0 auto; }
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+.footer {
+  text-align: center; padding: 14px;
+  font-size: 10.5px; color: var(--ink4);
+  border-top: 1px solid var(--border);
+  margin-top: 6px; letter-spacing: 0.02em;
+  background: var(--white);
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-brand">
+    <div class="hdr-logo">CW</div>
+    <div>
+      <div class="hdr-title">Retirement Drawdown Planner</div>
+      <div class="hdr-sub">Pension · ISA · GIA · Offshore Bond · Rental · Trust — Tax Efficiency Analysis</div>
     </div>
-    <div class="tbl-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th class="L">Age</th>
-            <th>Target Spend</th>
-            <th>Ext. Income</th>
-            <th>Pension Dr.</th>
-            <th>ISA/GIA/Bond</th>
-            <th>Tax Paid</th>
-            <th>Portfolio End</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody"></tbody>
-      </table>
+  </div>
+  <div class="hdr-tags">
+    <span class="tag" style="color:#8C9BB5;border-color:rgba(140,155,181,0.4);background:rgba(140,155,181,0.08)">Pension First</span>
+    <span class="tag" style="color:#2C5F8A;border-color:rgba(44,95,138,0.4);background:rgba(44,95,138,0.1)">ISA First</span>
+    <span class="tag" style="color:#4A7C6F;border-color:rgba(74,124,111,0.4);background:rgba(74,124,111,0.1)">Offshore First</span>
+    <span class="tag" style="color:#fff;border-color:rgba(58,108,200,0.6);background:rgba(58,108,200,0.25)">Blended ★</span>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- LEFT: INPUTS -->
+  <div>
+    <div class="panel">
+      <div class="panel-hd">
+        <div class="panel-hd-icon">💼</div>
+        <span class="panel-hd-title">Capital Sources</span>
+      </div>
+      <div class="panel-bd">
+
+        <div class="src" style="background:var(--royal-bg);border-color:var(--royal-bdr);border-left-color:var(--royal)">
+          <div class="src-label" style="color:var(--royal)">Pension (SIPP / DB)</div>
+          <div class="src-desc">Withdrawals taxed as earned income</div>
+          <div class="fld pre"><label>Pension Fund Value</label><div class="wrap"><span class="pre">£</span><input type="number" id="pension" value="400000" step="10000"></div></div>
+          <div class="fld pre"><label>Tax-Free Cash (PCLS)</label><div class="wrap"><span class="pre">£</span><input type="number" id="pcls" value="100000" step="5000"></div></div>
+          <div class="fld suf"><label>Gross Growth Rate</label><div class="wrap"><input type="number" id="pg" value="5.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+
+        <div class="src" style="background:var(--forest-bg);border-color:var(--forest-bdr);border-left-color:var(--forest)">
+          <div class="src-label" style="color:var(--forest)">ISA</div>
+          <div class="src-desc">All withdrawals completely tax free</div>
+          <div class="fld pre"><label>ISA Balance</label><div class="wrap"><span class="pre">£</span><input type="number" id="isa" value="100000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="ig" value="5.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+
+        <div class="src" style="background:var(--sage-bg);border-color:var(--sage-bdr);border-left-color:var(--sage)">
+          <div class="src-label" style="color:var(--sage)">General Investment Account</div>
+          <div class="src-desc">Capital gains taxed at CGT rate only</div>
+          <div class="fld pre"><label>GIA Balance</label><div class="wrap"><span class="pre">£</span><input type="number" id="gia" value="50000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="gg" value="4.5" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+
+        <div class="src" style="background:var(--steel-bg);border-color:var(--steel-bdr);border-left-color:var(--steel)">
+          <div class="src-label" style="color:var(--steel)">Offshore Bond</div>
+          <div class="src-desc">5% p.a. tax-deferred withdrawal allowance</div>
+          <div class="fld pre"><label>Bond Surrender Value</label><div class="wrap"><span class="pre">£</span><input type="number" id="ob" value="150000" step="5000"></div></div>
+          <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="obg" value="5.0" step="0.1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Tax-Exempt Years Remaining</label><div class="wrap"><input type="number" id="obYrs" value="20" step="1" min="0" max="20"><span class="suf">yrs</span></div></div>
+        </div>
+
+        <div class="fld suf"><label>Annual Platform / Adviser Fees</label><div class="wrap"><input type="number" id="fees" value="0.5" step="0.05"><span class="suf">%</span></div></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <div class="panel-hd-icon">📈</div>
+        <span class="panel-hd-title">Guaranteed Income Streams</span>
+      </div>
+      <div class="panel-bd">
+
+        <div class="src" style="background:rgba(44,95,138,0.05);border-color:rgba(44,95,138,0.18);border-left-color:var(--steel)">
+          <div class="src-label" style="color:var(--steel)">State Pension</div>
+          <div class="src-desc">Triple lock indexed — set your assumed rate</div>
+          <div class="fld pre"><label>Annual State Pension (gross)</label><div class="wrap"><span class="pre">£</span><input type="number" id="spAmt" value="11500" step="100"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts at Age</label><div class="wrap"><input type="number" id="spAge" value="67" step="1"></div></div>
+            <div class="fld suf"><label>Index Rate</label><div class="wrap"><input type="number" id="spIdx" value="3.5" step="0.1"><span class="suf">%</span></div></div>
+          </div>
+        </div>
+
+        <div class="src" style="background:var(--fern-bg);border-color:var(--fern-bdr);border-left-color:var(--fern)">
+          <div class="src-label" style="color:var(--fern)">Rental Property Income</div>
+          <div class="src-desc">Net rental income after costs, annually indexed</div>
+          <div class="fld pre"><label>Net Annual Rental Income</label><div class="wrap"><span class="pre">£</span><input type="number" id="rental" value="12000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts Age</label><div class="wrap"><input type="number" id="rentalAge" value="65" step="1"></div></div>
+            <div class="fld"><label>Ends Age (0 = never)</label><div class="wrap"><input type="number" id="rentalEnd" value="0" step="1"></div></div>
+          </div>
+          <div class="fld suf"><label>Annual Rent Increase</label><div class="wrap"><input type="number" id="rentalIdx" value="3.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+
+        <div class="src" style="background:var(--slate-bg);border-color:var(--slate-bdr);border-left-color:var(--slate)">
+          <div class="src-label" style="color:var(--slate)">Trust / Other Income</div>
+          <div class="src-desc">Trust distributions, annuity or other indexed income</div>
+          <div class="fld pre"><label>Net Annual Income</label><div class="wrap"><span class="pre">£</span><input type="number" id="trust" value="5000" step="500"></div></div>
+          <div class="fr">
+            <div class="fld"><label>Starts Age</label><div class="wrap"><input type="number" id="trustAge" value="65" step="1"></div></div>
+            <div class="fld"><label>Ends Age (0 = never)</label><div class="wrap"><input type="number" id="trustEnd" value="0" step="1"></div></div>
+          </div>
+          <div class="fld suf"><label>Annual Increase Rate</label><div class="wrap"><input type="number" id="trustIdx" value="2.5" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-hd">
+        <div class="panel-hd-icon">⚙️</div>
+        <span class="panel-hd-title">Spending & Tax Parameters</span>
+      </div>
+      <div class="panel-bd">
+        <div class="sl">Retirement Timeline</div>
+        <div class="fr">
+          <div class="fld"><label>Client Start Age</label><div class="wrap"><input type="number" id="sa" value="65" step="1"></div></div>
+          <div class="fld"><label>Years to Model</label><div class="wrap"><input type="number" id="ty" value="35" step="1"></div></div>
+        </div>
+        <div class="fld"><label>Care / Phase 2 Start Age</label><div class="wrap"><input type="number" id="ca" value="80" step="1"></div></div>
+        <div class="sl">Target Net Spending (today's £)</div>
+        <div class="fr">
+          <div class="fld pre"><label>Phase 1 Annual</label><div class="wrap"><span class="pre">£</span><input type="number" id="sp1" value="40000" step="500"></div></div>
+          <div class="fld pre"><label>Phase 2 Care Annual</label><div class="wrap"><span class="pre">£</span><input type="number" id="sp2" value="80000" step="500"></div></div>
+        </div>
+        <div class="sl">Tax Rates</div>
+        <div class="fr">
+          <div class="fld suf"><label>Income Tax — Phase 1</label><div class="wrap"><input type="number" id="t1" value="20" step="1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Income Tax — Phase 2</label><div class="wrap"><input type="number" id="t2" value="20" step="1"><span class="suf">%</span></div></div>
+        </div>
+        <div class="fld suf"><label>CGT Rate (GIA gains)</label><div class="wrap"><input type="number" id="cg" value="18" step="1"><span class="suf">%</span></div></div>
+        <div class="sl">Inflation Assumptions</div>
+        <div class="fr">
+          <div class="fld suf"><label>Phase 1 Inflation</label><div class="wrap"><input type="number" id="i1" value="2.5" step="0.1"><span class="suf">%</span></div></div>
+          <div class="fld suf"><label>Phase 2 Inflation</label><div class="wrap"><input type="number" id="i2" value="4.0" step="0.1"><span class="suf">%</span></div></div>
+        </div>
+        <button class="btn" onclick="calculate()">
+          <span>Run Strategy Comparison</span>
+          <span style="font-size:15px">→</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: RESULTS -->
+  <div id="results">
+    <div class="rpanel">
+      <div class="empty">
+        <div class="empty-icon">⚖</div>
+        <div class="empty-title">Multi-Source Retirement Drawdown Analysis</div>
+        <div class="empty-body">
+          Configure all capital sources and income streams using the panel on the left.<br><br>
+          All income streams are <strong>indexed annually</strong> throughout the full model period.
+          The model runs to completion — <strong>showing the annual shortfall</strong> in every year after the fund is depleted.<br><br>
+          Click <strong>Run Strategy Comparison</strong> to generate the full analysis.
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
+<div class="footer">
+  For illustrative purposes only &nbsp;·&nbsp; Not financial advice &nbsp;·&nbsp; Tax treatment depends on individual circumstances and may change &nbsp;·&nbsp;
+  Canaccord Genuity Wealth Management Limited &nbsp;·&nbsp; Authorised and regulated by the FCA (ref. 194927)
+</div>
+
 <script>
-// ... (Your existing g, ff, ffz, fmt functions) ...
+function g(id){return parseFloat(document.getElementById(id).value)||0;}
+function ff(v){if(!v&&v!==0)return'—';if(v===0)return'—';var n=v<0,a=Math.abs(v);return(n?'-':'')+'£'+Math.round(a).toLocaleString('en-GB');}
+function ffz(v){if(v==null||isNaN(v))return'—';var n=v<0,a=Math.abs(v);return(n?'-':'')+'£'+Math.round(a).toLocaleString('en-GB');}
+function fmt(v){if(v==null||isNaN(v))return'—';var n=v<0,a=Math.abs(v);var s=a>=1e6?(a/1e6).toFixed(1)+'m':a>=1000?Math.round(a/1000)+'k':Math.round(a)+'';return(n?'-':'')+'£'+s;}
 
-function calculate() {
-    var p = {
-        pension: g('pension'), isa: g('isa'), gia: g('gia'), pcls: g('pcls'),
-        ob: g('ob'), obg: g('obg'), obYrs: g('obYrs'),
-        sa: g('sa'), ty: g('ty'), ca: g('ca'),
-        sp1: g('sp1'), sp2: g('sp2'), t1: g('t1'), t2: g('t2'), cg: g('cg'),
-        spAmt: g('spAmt'), spAge: g('spAge'), spIdx: g('spIdx'),
-        rental: g('rental'), rentalAge: g('rentalAge'), rentalEnd: g('rentalEnd'), rentalIdx: g('rentalIdx'),
-        trust: g('trust'), trustAge: g('trustAge'), trustEnd: g('trustEnd'), trustIdx: g('trustIdx'),
-        i1: g('i1'), i2: g('i2'), pg: g('pg'), ig: g('ig'), gg: g('gg'), fees: g('fees')
-    };
-
-    var pf = runStrategy(p, 'pension'), if_ = runStrategy(p, 'isa'), ob_ = runStrategy(p, 'offshore'), bl = runStrategy(p, 'blended');
-    
-    // Update the Results UI (Banner and KPI Cards logic as you had it)
-    document.getElementById('results').innerHTML = generateResultsHTML(p, pf, if_, ob_, bl);
-
-    // Render Charts
-    drawLine('lineChart', bl.rows.map((r, i) => ({
-        age: r.age,
-        'Pension First': pf.rows[i].total,
-        'ISA First': if_.rows[i].total,
-        'Offshore First': ob_.rows[i].total,
-        'Blended': r.total
-    })), ['Pension First', 'ISA First', 'Offshore First', 'Blended'], ['#C0392B', '#2A7070', '#C47820', '#3A6B5A']);
-
-    drawBar('barChart', bl.rows, ['fp', 'fi', 'fg', 'fob', 'spN', 'rentalG', 'trustG'], 
-           ['#6B4580', '#2A7070', '#3A6B5A', '#C47820', '#B8922A', '#A04040', '#6B4580']);
-
-    // Fill Table
-    const tbody = document.getElementById('tableBody');
-    bl.rows.forEach(r => {
-        const tr = document.createElement('tr');
-        if(r.depleted) tr.className = 'depl-row';
-        tr.innerHTML = `
-            <td class="L">Age ${r.age}</td>
-            <td>${ff(r.tns)}</td>
-            <td>${ff(r.extIncome)}</td>
-            <td>${ff(r.fp)}</td>
-            <td>${ff(r.fi + r.fg + r.fob)}</td>
-            <td style="color:var(--err)">${ff(r.taxP)}</td>
-            <td style="font-weight:600">${ff(r.total)}</td>
-        `;
-        tbody.appendChild(tr);
-    });
+function runStrategy(p,strat){
+  var PG=p.pg/100-p.fees/100,IG=p.ig/100-p.fees/100,GG=p.gg/100-p.fees/100,OBG=p.obg/100-p.fees/100;
+  var T1=p.t1/100,T2=p.t2/100,CG=p.cg/100;
+  var cYr=p.ca-p.sa+1;
+  var pB=p.pension-p.pcls,iB=p.isa,gB=p.gia,obB=p.ob;
+  var obOrig=p.ob,obEx=p.obYrs;
+  var totTax=0,totShortfall=0,depleted=false,depAge=null;
+  var rows=[];
+  for(var yr=1;yr<=p.ty;yr++){
+    var age=p.sa+yr-1,ph=yr>=cYr?2:1,tax=ph===2?T2:T1;
+    var inf=ph===2?p.i2/100:p.i1/100,phYr=ph===2?yr-cYr+1:yr;
+    var tns=(ph===2?p.sp2:p.sp1)*Math.pow(1+inf,phYr-1);
+    var spG=age>=p.spAge?p.spAmt*Math.pow(1+p.spIdx/100,age-p.spAge):0;
+    var spN=spG*(1-tax);
+    var rEnd=p.rentalEnd>0?p.rentalEnd:9999;
+    var rentalG=(p.rental>0&&age>=p.rentalAge&&age<rEnd)?p.rental*Math.pow(1+p.rentalIdx/100,Math.max(0,age-p.rentalAge)):0;
+    var tEnd=p.trustEnd>0?p.trustEnd:9999;
+    var trustG=(p.trust>0&&age>=p.trustAge&&age<tEnd)?p.trust*Math.pow(1+p.trustIdx/100,Math.max(0,age-p.trustAge)):0;
+    var extIncome=spN+rentalG+trustG;
+    var needed=Math.max(0,tns-extIncome);
+    var fp=0,fi=0,fg=0,fob=0,taxP=0;
+    var obAllow=obEx>0?obOrig*0.05:0;
+    if(!depleted){
+      if(strat==='pension'){
+        fp=pB>0&&needed>0?Math.min(pB,needed/(1-tax)):0;taxP=fp*tax;
+        var r=Math.max(0,needed-fp*(1-tax));
+        fi=Math.min(iB,r);r=Math.max(0,r-fi);
+        fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);
+        if(r>0&&obB>0){if(obEx>0){fob=Math.min(obB,Math.min(obAllow,r));}else{fob=Math.min(obB,r/(1-tax));taxP+=fob*tax;}}
+      }else if(strat==='isa'){
+        fi=Math.min(iB,needed);var r=Math.max(0,needed-fi);
+        if(r>0&&obB>0&&obEx>0){fob=Math.min(obB,Math.min(obAllow,r));r=Math.max(0,r-fob);}
+        fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);
+        fp=pB>0&&r>0?r/(1-tax):0;taxP+=fp*tax;
+      }else if(strat==='offshore'){
+        if(obB>0&&obEx>0){fob=Math.min(obB,Math.min(obAllow,needed));}
+        else if(obB>0&&needed>0){fob=Math.min(obB,needed/(1-tax));taxP+=fob*tax;}
+        var obNet=obEx>0?fob:fob*(1-tax);
+        var r=Math.max(0,needed-obNet);
+        fi=Math.min(iB,r);r=Math.max(0,r-fi);
+        fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);
+        fp=pB>0&&r>0?r/(1-tax):0;taxP+=fp*tax;
+      }else{
+        var pa=12570;fp=Math.min(pB,pa);
+        var r=Math.max(0,needed-fp);
+        if(r>0&&obB>0&&obEx>0){fob=Math.min(obB,Math.min(obAllow,r));r=Math.max(0,r-fob);}
+        if(r>0){fi=Math.min(iB,r);r=Math.max(0,r-fi);}
+        if(r>0){fg=Math.min(gB,r);taxP+=fg*CG;r=Math.max(0,r-fg);}
+        if(r>0&&pB-fp>0){var ex=r/(1-tax);fp+=ex;taxP+=ex*tax;}
+        if(fob>0&&obEx<=0){taxP+=fob*tax;}
+      }
+      if(fob>0&&obEx>0)obEx--;
+      pB=Math.max(0,pB-fp)*(1+PG);
+      iB=Math.max(0,iB-fi)*(1+IG);
+      gB=Math.max(0,gB-fg)*(1+GG);
+      obB=Math.max(0,obB-fob)*(1+OBG);
+      totTax+=taxP;
+      if(pB<=0&&iB<=0&&gB<=0&&obB<=0&&!depleted){depleted=true;depAge=age;}
+    }else{pB=0;iB=0;gB=0;obB=0;}
+    var total=pB+iB+gB+obB;
+    var shortfall=depleted&&needed>0?needed:0;
+    totShortfall+=shortfall;
+    rows.push({age:age,ph:ph,tns:tns,spN:spN,rentalG:rentalG,trustG:trustG,extIncome:extIncome,
+      needed:needed,fp:fp,fi:fi,fg:fg,fob:fob,taxP:taxP,obExLeft:obEx,
+      pB:pB,iB:iB,gB:gB,obB:obB,total:total,shortfall:shortfall,depleted:depleted});
+  }
+  return{rows:rows,totTax:totTax,totShortfall:totShortfall,final:pB+iB+gB+obB,depAge:depAge};
 }
-// ... (Add your drawLine and drawBar functions here) ...
+
+/* Refined professional colour palette for charts */
+var C = {
+  pension:   '#1C3F7A',  /* royal blue   */
+  isa:       '#1A5C3A',  /* forest green */
+  gia:       '#4A7C6F',  /* sage         */
+  ob:        '#2C5F8A',  /* steel blue   */
+  sp:        '#3D6480',  /* slate        */
+  rental:    '#2E7D52',  /* fern green   */
+  trust:     '#4A6FA5',  /* accent blue  */
+  shortfall: 'rgba(185,28,28,0.35)',
+
+  pfLine:    '#8C9BB5',  /* muted grey-blue  */
+  isaLine:   '#2C5F8A',  /* steel blue       */
+  obLine:    '#4A7C6F',  /* sage green       */
+  blLine:    '#1C3F7A',  /* royal blue bold  */
+};
+
+function drawLine(id,rows,keys,cols,dashes){
+  var cv=document.getElementById(id);if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.offsetWidth,H=cv.height=215;
+  ctx.clearRect(0,0,W,H);
+  var pd={t:14,r:16,b:28,l:70};
+  var cW=W-pd.l-pd.r,cH=H-pd.t-pd.b;
+  var all=[];rows.forEach(function(r){keys.forEach(function(k){if(r[k]!=null)all.push(r[k]);});});
+  var mn=Math.min(0,Math.min.apply(null,all)),mx=Math.max.apply(null,all)||1,rng=mx-mn;
+  function xp(i){return pd.l+(rows.length>1?i*cW/(rows.length-1):cW/2);}
+  function yp(v){return pd.t+cH-(v-mn)/rng*cH;}
+  ctx.strokeStyle='rgba(0,0,0,0.055)';ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='500 9.5px "Source Sans 3",sans-serif';
+  for(var i=0;i<=4;i++){
+    var y=pd.t+cH*i/4;
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.38)';ctx.fillText(fmt(mx-rng*i/4),4,y+4);
+  }
+  if(mn<0){
+    var zy=yp(0);ctx.strokeStyle='rgba(185,28,28,0.25)';ctx.setLineDash([5,3]);
+    ctx.beginPath();ctx.moveTo(pd.l,zy);ctx.lineTo(W-pd.r,zy);ctx.stroke();ctx.setLineDash([]);
+  }
+  keys.forEach(function(k,ki){
+    ctx.strokeStyle=cols[ki];
+    ctx.lineWidth=ki===keys.length-1?2.8:1.6;
+    ctx.globalAlpha=ki===keys.length-1?1:0.7;
+    ctx.setLineDash(dashes&&dashes[ki]?dashes[ki]:[]);
+    ctx.beginPath();var st=false;
+    rows.forEach(function(r,ri){if(r[k]==null)return;if(!st){ctx.moveTo(xp(ri),yp(r[k]));st=true;}else ctx.lineTo(xp(ri),yp(r[k]));});
+    ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
+  });
+  ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px "Source Sans 3",sans-serif';
+  rows.forEach(function(r,ri){if(ri%4===0)ctx.fillText(r.age,xp(ri)-7,H-6);});
+}
+
+function drawBar(id,rows,keys,cols){
+  var cv=document.getElementById(id);if(!cv)return;
+  var ctx=cv.getContext('2d');
+  var W=cv.width=cv.offsetWidth,H=cv.height=190;
+  ctx.clearRect(0,0,W,H);
+  var pd={t:14,r:16,b:28,l:70};
+  var cW=W-pd.l-pd.r,cH=H-pd.t-pd.b;
+  var mx=0;
+  rows.forEach(function(r){var s=0;keys.forEach(function(k){s+=(r[k]||0);});s+=(r.shortfall||0);if(s>mx)mx=s;});
+  if(!mx)return;
+  var bW=cW/rows.length,gap=0.6;
+  ctx.strokeStyle='rgba(0,0,0,0.055)';ctx.font='9.5px "Source Sans 3",sans-serif';
+  for(var i=0;i<=4;i++){
+    var y=pd.t+cH-(cH*i/4);
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='rgba(0,0,0,0.38)';ctx.fillText(fmt(mx*i/4),4,y+4);
+  }
+  rows.forEach(function(r,ri){
+    var x=pd.l+ri*bW+gap/2,by=pd.t+cH;
+    keys.forEach(function(k,ki){
+      var v=r[k]||0,bh=v/mx*cH;
+      if(bh>0){ctx.fillStyle=cols[ki];ctx.fillRect(x,by-bh,bW-gap,bh);by-=bh;}
+    });
+    if(r.shortfall>0){
+      var sh=r.shortfall/mx*cH;
+      ctx.fillStyle='rgba(185,28,28,0.35)';ctx.fillRect(x,by-sh,bW-gap,sh);
+    }
+    if(ri%4===0){ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px "Source Sans 3",sans-serif';ctx.fillText(r.age,pd.l+ri*bW+bW/2-7,H-6);}
+  });
+}
+
+function calculate(){
+  var p={
+    pension:g('pension'),isa:g('isa'),gia:g('gia'),pcls:g('pcls'),
+    ob:g('ob'),obg:g('obg'),obYrs:g('obYrs'),
+    sa:g('sa'),ty:g('ty'),ca:g('ca'),
+    sp1:g('sp1'),sp2:g('sp2'),t1:g('t1'),t2:g('t2'),cg:g('cg'),
+    spAmt:g('spAmt'),spAge:g('spAge'),spIdx:g('spIdx'),
+    rental:g('rental'),rentalAge:g('rentalAge'),rentalEnd:g('rentalEnd'),rentalIdx:g('rentalIdx'),
+    trust:g('trust'),trustAge:g('trustAge'),trustEnd:g('trustEnd'),trustIdx:g('trustIdx'),
+    i1:g('i1'),i2:g('i2'),pg:g('pg'),ig:g('ig'),gg:g('gg'),fees:g('fees')
+  };
+  var pf=runStrategy(p,'pension'),if_=runStrategy(p,'isa'),ob_=runStrategy(p,'offshore'),bl=runStrategy(p,'blended');
+  var saving=pf.totTax-bl.totTax;
+
+  var cmpRows=Array.from({length:p.ty},function(_,i){return{
+    age:p.sa+i,
+    'pf':pf.rows[i]?pf.rows[i].total:0,
+    'if':if_.rows[i]?if_.rows[i].total:0,
+    'ob':ob_.rows[i]?ob_.rows[i].total:0,
+    'bl':bl.rows[i]?bl.rows[i].total:0
+  };});
+
+  var html='';
+
+  /* Banner */
+  html+='<div class="banner">';
+  html+='<div style="font-size:22px;flex-shrink:0;margin-top:2px">✓</div><div>';
+  html+='<div class="banner-title">Optimal Strategy: Blended Approach</div>';
+  html+='<div class="banner-body">';
+  html+='Pension First: <strong style="color:var(--err)">'+ffz(pf.totTax)+'</strong> tax';
+  html+=' &nbsp;·&nbsp; ISA First: <strong style="color:var(--steel)">'+ffz(if_.totTax)+'</strong>';
+  html+=' &nbsp;·&nbsp; Offshore First: <strong style="color:var(--sage)">'+ffz(ob_.totTax)+'</strong>';
+  html+=' &nbsp;·&nbsp; Blended: <strong style="color:var(--forest)">'+ffz(bl.totTax)+'</strong>';
+  html+='<br>Tax saving versus pension-first: <strong style="color:var(--royal)">'+ffz(saving)+'</strong>';
+  if(bl.totShortfall>0)html+=' &nbsp;·&nbsp; <strong style="color:var(--err)">⚠ Cumulative shortfall: '+ffz(bl.totShortfall)+'</strong>';
+  html+='</div></div></div>';
+
+  /* KPI cards */
+  var strats=[
+    {lb:'Pension First', sr:pf, top:'#8C9BB5', c:'#8C9BB5'},
+    {lb:'ISA First',     sr:if_, top:C.ob,     c:C.ob},
+    {lb:'Offshore First',sr:ob_, top:C.sage,   c:C.sage},
+    {lb:'Blended ★',    sr:bl,  top:C.pension, c:C.pension},
+  ];
+  html+='<div class="kpi-grid">';
+  strats.forEach(function(s){
+    html+='<div class="kpi-card" style="border-top-color:'+s.top+'">';
+    html+='<div class="kpi-lbl" style="color:'+s.c+'">'+s.lb+'</div>';
+    html+='<div class="kpi-v" style="color:'+(s.sr.final>0?s.c:'var(--err)')+'">'+fmt(s.sr.final)+'</div>';
+    html+='<div class="kpi-note">Final fund value</div>';
+    html+='<div style="margin-top:9px"><div class="kpi-lbl">Tax paid</div>';
+    html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:15px;font-weight:500;color:var(--err)">'+ffz(s.sr.totTax)+'</div></div>';
+    html+='<div style="margin-top:7px"><div class="kpi-lbl">Fund lasts to</div>';
+    html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:14px;font-weight:500;color:'+(s.sr.depAge?'var(--err)':s.c)+'">'+
+      (s.sr.depAge?'Age '+s.sr.depAge:'No depletion')+'</div></div>';
+    if(s.sr.totShortfall>0){
+      html+='<div style="margin-top:7px"><div class="kpi-lbl">Total shortfall</div>';
+      html+='<div style="font-family:\'Source Code Pro\',monospace;font-size:13px;color:var(--err)">'+ffz(s.sr.totShortfall)+'</div></div>';
+    }
+    html+='</div>';
+  });
+  html+='</div>';
+
+  /* Line chart */
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Total Portfolio Value — All Four Strategies</span>';
+  html+='<div class="leg">';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:#8C9BB5"></span>Pension First</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.ob+'"></span>ISA First</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.sage+'"></span>Offshore First</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.pension+'"></span>Blended</span>';
+  html+='</div></div><div class="rpanel-bd"><canvas id="lineChart" style="width:100%;display:block"></canvas></div></div>';
+
+  /* Bar chart */
+  html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Annual Income by Source — Blended Strategy</span>';
+  html+='<div class="leg">';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.pension+'"></span>Pension</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.isa+'"></span>ISA</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.gia+'"></span>GIA</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.ob+'"></span>Offshore Bond</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.sp+'"></span>State Pension</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.rental+'"></span>Rental</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.trust+'"></span>Trust/Other</span>';
+  html+='<span class="leg-item"><span class="leg-dot" style="background:rgba(185,28,28,0.45)"></span>Shortfall</span>';
+  html+='</div></div><div class="rpanel-bd"><canvas id="barChart" style="width:100%;display:block"></canvas></div></div>';
+
+  /* Table */
+  html+='<div class="rpanel"><div class="rpanel-hd">';
+  html+='<span class="rpanel-title">Year-by-Year Analysis — Blended Strategy</span>';
+  html+='<span style="font-size:11px;color:var(--err);font-weight:600">⚠ Red rows = fund depleted</span>';
+  html+='</div><div class="tbl-wrap"><table><thead><tr>';
+  var hdrs=[
+    {t:'Age',L:true,c:''},{t:'Phase',L:true,c:''},
+    {t:'Target',c:''},{t:'St. Pension',c:C.sp},
+    {t:'Rental',c:C.rental},{t:'Trust',c:C.trust},
+    {t:'Pension Draw',c:C.pension},{t:'ISA Draw',c:C.isa},
+    {t:'GIA Draw',c:C.gia},{t:'Offshore Bond',c:C.ob},
+    {t:'OB Yrs',c:C.ob},{t:'Tax Paid',c:'var(--err)'},
+    {t:'Fund Total',c:''},{t:'Shortfall',c:'var(--err)'}
+  ];
+  hdrs.forEach(function(h){
+    html+='<th'+(h.L?' class="L"':'')+' style="'+(h.c?'color:'+h.c:'')+'">' +h.t+'</th>';
+  });
+  html+='</tr></thead><tbody>';
+
+  bl.rows.forEach(function(row){
+    var dep=row.depleted;
+    var ph1=row.ph===1;
+    var phB=ph1
+      ?'<span class="badge" style="background:var(--royal-bg);color:var(--royal);border:1px solid var(--royal-bdr)">Phase 1</span>'
+      :'<span class="badge" style="background:rgba(185,28,28,0.07);color:var(--err);border:1px solid rgba(185,28,28,0.2)">Phase 2</span>';
+    var obY=row.obExLeft>0
+      ?'<span style="color:var(--steel);font-weight:600">'+row.obExLeft+'</span>'
+      :'<span style="color:var(--err);font-size:10px;font-weight:600">Taxable</span>';
+    var fundCol=row.total<=0?'var(--err)':row.total<30000?'var(--warn)':'var(--ink)';
+    html+='<tr'+(dep?' class="depl-row"':'')+'>';
+    html+='<td class="L" style="color:'+(dep?'var(--err)':'var(--ink)')+'">'+row.age+'</td>';
+    html+='<td class="L">'+phB+'</td>';
+    html+='<td>'+ffz(row.tns)+'</td>';
+    html+='<td style="color:'+C.sp+'">'+ffz(row.spN)+'</td>';
+    html+='<td style="color:'+C.rental+'">'+ffz(row.rentalG)+'</td>';
+    html+='<td style="color:'+C.trust+'">'+ffz(row.trustG)+'</td>';
+    html+='<td style="color:'+C.pension+'">'+ff(row.fp)+'</td>';
+    html+='<td style="color:'+C.isa+'">'+ff(row.fi)+'</td>';
+    html+='<td style="color:'+C.gia+'">'+ff(row.fg)+'</td>';
+    html+='<td style="color:'+C.ob+'">'+ff(row.fob)+'</td>';
+    html+='<td style="text-align:center">'+obY+'</td>';
+    html+='<td style="color:var(--err);font-weight:600">'+ff(row.taxP)+'</td>';
+    html+='<td style="color:'+fundCol+';font-weight:700">'+ffz(row.total)+'</td>';
+    html+='<td style="color:var(--err);font-weight:700">'+(row.shortfall>0?ffz(row.shortfall):'—')+'</td>';
+    html+='</tr>';
+  });
+  html+='</tbody></table></div></div>';
+
+  /* Insight */
+  html+='<div class="insight">';
+  html+='<div style="font-size:16px;flex-shrink:0;margin-top:3px;color:var(--royal)">ℹ</div>';
+  html+='<div class="insight-body">';
+  html+='<strong style="color:var(--royal)">Blended Sequencing Logic</strong><br>';
+  html+='State pension indexed at '+p.spIdx+'%/yr · Rental income grows at '+p.rentalIdx+'%/yr · Trust income grows at '+p.trustIdx+'%/yr. All reduce the capital draw required each year.<br>';
+  html+='<strong>Sequencing:</strong> Pension to personal allowance (£12,570 tax-free) → Offshore bond 5% allowance (tax-deferred) → ISA (tax-free) → GIA (CGT only) → Pension top-up (taxed at income tax rate).<br>';
+  html+='<strong style="color:var(--err)">After fund depletion</strong> — the model continues every year to age '+(p.sa+p.ty-1)+', showing the precise shortfall. Guaranteed income (state pension, rental, trust) continues regardless of fund balance.';
+  html+='</div></div>';
+
+  document.getElementById('results').innerHTML=html;
+  setTimeout(function(){
+    drawLine('lineChart',cmpRows,['pf','if','ob','bl'],
+      [C.pfLine,C.isaLine,C.obLine,C.blLine],
+      [[5,4],[4,3],[3,2],[]]);
+    drawBar('barChart',bl.rows,
+      ['fp','fi','fg','fob','spN','rentalG','trustG'],
+      [C.pension,C.isa,C.gia,C.ob,C.sp,C.rental,C.trust]);
+  },60);
+}
 </script>
+</body>
+</html>
