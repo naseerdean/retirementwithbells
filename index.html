@@ -7,15 +7,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
 :root {
-  /* Royal blue foundation */
   --royal:       #1C3F7A;
   --royal-dk:    #142D5A;
   --royal-md:    #2A52A0;
   --royal-lt:    #3A6CC8;
   --royal-bg:    rgba(28,63,122,0.06);
   --royal-bdr:   rgba(28,63,122,0.18);
-
-  /* Professional greens */
   --forest:      #1A5C3A;
   --forest-bg:   rgba(26,92,58,0.06);
   --forest-bdr:  rgba(26,92,58,0.18);
@@ -25,16 +22,12 @@
   --sage:        #4A7C6F;
   --sage-bg:     rgba(74,124,111,0.06);
   --sage-bdr:    rgba(74,124,111,0.18);
-
-  /* Steel blues */
   --steel:       #2C5F8A;
   --steel-bg:    rgba(44,95,138,0.06);
   --steel-bdr:   rgba(44,95,138,0.18);
   --slate:       #3D6480;
   --slate-bg:    rgba(61,100,128,0.06);
   --slate-bdr:   rgba(61,100,128,0.18);
-
-  /* Neutral greys — proper financial tool neutrals */
   --ink:         #1E2530;
   --ink2:        #2E3645;
   --ink3:        #4A5568;
@@ -45,24 +38,17 @@
   --bg2:         #EDF0F5;
   --bg3:         #E2E7EF;
   --white:       #FFFFFF;
-
-  /* Functional */
   --err:         #B91C1C;
   --err-bg:      rgba(185,28,28,0.05);
   --warn:        #B45309;
   --ok:          #166534;
-
-  /* Accent — muted steel-gold for KPI highlights only */
   --accent:      #4A6FA5;
-
   --shadow-sm:   0 1px 2px rgba(0,0,0,0.05), 0 2px 8px rgba(0,0,0,0.04);
   --shadow:      0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.06);
   --r:           6px;
   --r2:          10px;
 }
-
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body {
   background: var(--bg);
   font-family: 'Source Sans 3', sans-serif;
@@ -72,12 +58,9 @@ body {
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
 }
-
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: var(--bg2); }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
-
-/* ── HEADER ─────────────────────────────────────────────────── */
 .hdr {
   background: var(--royal-dk);
   border-bottom: 3px solid var(--royal-lt);
@@ -124,8 +107,6 @@ body {
   border: 1px solid;
   text-transform: uppercase;
 }
-
-/* ── LAYOUT ──────────────────────────────────────────────────── */
 .main {
   max-width: 1500px;
   margin: 0 auto;
@@ -135,8 +116,6 @@ body {
   gap: 16px;
   align-items: start;
 }
-
-/* ── INPUT PANELS ────────────────────────────────────────────── */
 .panel {
   background: var(--white);
   border: 1px solid var(--border);
@@ -167,8 +146,6 @@ body {
   color: var(--royal);
 }
 .panel-bd { padding: 16px; }
-
-/* ── SOURCE BLOCKS ───────────────────────────────────────────── */
 .src {
   border-radius: var(--r);
   padding: 12px;
@@ -193,8 +170,6 @@ body {
   color: var(--ink4);
   font-style: italic;
 }
-
-/* ── FORM FIELDS ─────────────────────────────────────────────── */
 .fld { margin-bottom: 8px; }
 .fld label {
   display: block;
@@ -248,8 +223,6 @@ input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
   padding-bottom: 5px;
   border-bottom: 1px solid var(--royal-bdr);
 }
-
-/* ── RUN BUTTON ──────────────────────────────────────────────── */
 .btn {
   width: 100%;
   padding: 11px 16px;
@@ -268,8 +241,6 @@ input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
 }
 .btn:hover { background: var(--royal-md); box-shadow: 0 2px 8px rgba(28,63,122,0.25); }
 .btn:active { background: var(--royal-dk); }
-
-/* ── KPI GRID ────────────────────────────────────────────────── */
 .kpi-grid {
   display: grid;
   grid-template-columns: repeat(4,1fr);
@@ -300,8 +271,6 @@ input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
   margin-bottom: 3px;
 }
 .kpi-note { font-size: 10.5px; color: var(--ink4); }
-
-/* ── BANNER ──────────────────────────────────────────────────── */
 .banner {
   background: var(--forest-bg);
   border: 1px solid var(--forest-bdr);
@@ -318,8 +287,6 @@ input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
   margin-bottom: 4px;
 }
 .banner-body { font-size: 12.5px; line-height: 1.7; color: var(--ink2); }
-
-/* ── RESULT PANELS ───────────────────────────────────────────── */
 .rpanel {
   background: var(--white);
   border: 1px solid var(--border);
@@ -341,8 +308,6 @@ input[type=number]::-webkit-inner-spin-button { opacity: 0.25; }
   font-size: 13px; font-weight: 700; color: var(--ink);
 }
 .rpanel-bd { padding: 14px; }
-
-/* ── TABLE ───────────────────────────────────────────────────── */
 .tbl-wrap { overflow-x: auto; max-height: 420px; overflow-y: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 12px; }
 th {
@@ -387,13 +352,9 @@ tr:hover td { background: rgba(28,63,122,0.03); }
   text-transform: uppercase;
   font-family: 'Source Sans 3', sans-serif;
 }
-
-/* ── LEGEND ──────────────────────────────────────────────────── */
 .leg { display: flex; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
 .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--ink3); font-weight: 500; }
 .leg-dot { width: 10px; height: 10px; border-radius: 2px; }
-
-/* ── INSIGHT ─────────────────────────────────────────────────── */
 .insight {
   background: var(--royal-bg);
   border: 1px solid var(--royal-bdr);
@@ -404,8 +365,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
   margin-bottom: 4px;
 }
 .insight-body { font-size: 12.5px; color: var(--ink2); line-height: 1.75; }
-
-/* ── EMPTY STATE ─────────────────────────────────────────────── */
 .empty { padding: 56px 40px; text-align: center; }
 .empty-icon { font-size: 44px; margin-bottom: 14px; opacity: 0.25; }
 .empty-title {
@@ -414,8 +373,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
   color: var(--ink); margin-bottom: 10px;
 }
 .empty-body { font-size: 13px; color: var(--ink3); line-height: 1.85; max-width: 440px; margin: 0 auto; }
-
-/* ── FOOTER ──────────────────────────────────────────────────── */
 .footer {
   text-align: center; padding: 14px;
   font-size: 10.5px; color: var(--ink4);
@@ -427,7 +384,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
 </head>
 <body>
 
-<!-- HEADER -->
 <header class="hdr">
   <div class="hdr-brand">
     <div class="hdr-logo">CW</div>
@@ -445,8 +401,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
 </header>
 
 <div class="main">
-
-  <!-- LEFT: INPUTS -->
   <div>
     <div class="panel">
       <div class="panel-hd">
@@ -454,7 +408,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
         <span class="panel-hd-title">Capital Sources</span>
       </div>
       <div class="panel-bd">
-
         <div class="src" style="background:var(--royal-bg);border-color:var(--royal-bdr);border-left-color:var(--royal)">
           <div class="src-label" style="color:var(--royal)">Pension (SIPP / DB)</div>
           <div class="src-desc">Withdrawals taxed as earned income</div>
@@ -462,21 +415,18 @@ tr:hover td { background: rgba(28,63,122,0.03); }
           <div class="fld pre"><label>Tax-Free Cash (PCLS)</label><div class="wrap"><span class="pre">£</span><input type="number" id="pcls" value="100000" step="5000"></div></div>
           <div class="fld suf"><label>Gross Growth Rate</label><div class="wrap"><input type="number" id="pg" value="5.0" step="0.1"><span class="suf">%</span></div></div>
         </div>
-
         <div class="src" style="background:var(--forest-bg);border-color:var(--forest-bdr);border-left-color:var(--forest)">
           <div class="src-label" style="color:var(--forest)">ISA</div>
           <div class="src-desc">All withdrawals completely tax free</div>
           <div class="fld pre"><label>ISA Balance</label><div class="wrap"><span class="pre">£</span><input type="number" id="isa" value="100000" step="5000"></div></div>
           <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="ig" value="5.0" step="0.1"><span class="suf">%</span></div></div>
         </div>
-
         <div class="src" style="background:var(--sage-bg);border-color:var(--sage-bdr);border-left-color:var(--sage)">
           <div class="src-label" style="color:var(--sage)">General Investment Account</div>
           <div class="src-desc">Capital gains taxed at CGT rate only</div>
           <div class="fld pre"><label>GIA Balance</label><div class="wrap"><span class="pre">£</span><input type="number" id="gia" value="50000" step="5000"></div></div>
           <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="gg" value="4.5" step="0.1"><span class="suf">%</span></div></div>
         </div>
-
         <div class="src" style="background:var(--steel-bg);border-color:var(--steel-bdr);border-left-color:var(--steel)">
           <div class="src-label" style="color:var(--steel)">Offshore Bond</div>
           <div class="src-desc">5% p.a. tax-deferred withdrawal allowance</div>
@@ -484,7 +434,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
           <div class="fld suf"><label>Growth Rate</label><div class="wrap"><input type="number" id="obg" value="5.0" step="0.1"><span class="suf">%</span></div></div>
           <div class="fld suf"><label>Tax-Exempt Years Remaining</label><div class="wrap"><input type="number" id="obYrs" value="20" step="1" min="0" max="20"><span class="suf">yrs</span></div></div>
         </div>
-
         <div class="fld suf"><label>Annual Platform / Adviser Fees</label><div class="wrap"><input type="number" id="fees" value="0.5" step="0.05"><span class="suf">%</span></div></div>
       </div>
     </div>
@@ -495,7 +444,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
         <span class="panel-hd-title">Guaranteed Income Streams</span>
       </div>
       <div class="panel-bd">
-
         <div class="src" style="background:rgba(44,95,138,0.05);border-color:rgba(44,95,138,0.18);border-left-color:var(--steel)">
           <div class="src-label" style="color:var(--steel)">State Pension</div>
           <div class="src-desc">Triple lock indexed — set your assumed rate</div>
@@ -505,7 +453,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
             <div class="fld suf"><label>Index Rate</label><div class="wrap"><input type="number" id="spIdx" value="3.5" step="0.1"><span class="suf">%</span></div></div>
           </div>
         </div>
-
         <div class="src" style="background:var(--fern-bg);border-color:var(--fern-bdr);border-left-color:var(--fern)">
           <div class="src-label" style="color:var(--fern)">Rental Property Income</div>
           <div class="src-desc">Net rental income after costs, annually indexed</div>
@@ -516,7 +463,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
           </div>
           <div class="fld suf"><label>Annual Rent Increase</label><div class="wrap"><input type="number" id="rentalIdx" value="3.0" step="0.1"><span class="suf">%</span></div></div>
         </div>
-
         <div class="src" style="background:var(--slate-bg);border-color:var(--slate-bdr);border-left-color:var(--slate)">
           <div class="src-label" style="color:var(--slate)">Trust / Other Income</div>
           <div class="src-desc">Trust distributions, annuity or other indexed income</div>
@@ -566,7 +512,6 @@ tr:hover td { background: rgba(28,63,122,0.03); }
     </div>
   </div>
 
-  <!-- RIGHT: RESULTS -->
   <div id="results">
     <div class="rpanel">
       <div class="empty">
@@ -663,21 +608,10 @@ function runStrategy(p,strat){
   return{rows:rows,totTax:totTax,totShortfall:totShortfall,final:pB+iB+gB+obB,depAge:depAge};
 }
 
-/* Refined professional colour palette for charts */
-var C = {
-  pension:   '#1C3F7A',  /* royal blue   */
-  isa:       '#1A5C3A',  /* forest green */
-  gia:       '#4A7C6F',  /* sage         */
-  ob:        '#2C5F8A',  /* steel blue   */
-  sp:        '#3D6480',  /* slate        */
-  rental:    '#2E7D52',  /* fern green   */
-  trust:     '#4A6FA5',  /* accent blue  */
-  shortfall: 'rgba(185,28,28,0.35)',
-
-  pfLine:    '#8C9BB5',  /* muted grey-blue  */
-  isaLine:   '#2C5F8A',  /* steel blue       */
-  obLine:    '#4A7C6F',  /* sage green       */
-  blLine:    '#1C3F7A',  /* royal blue bold  */
+var C={
+  pension:'#1C3F7A',isa:'#1A5C3A',gia:'#4A7C6F',ob:'#2C5F8A',
+  sp:'#3D6480',rental:'#2E7D52',trust:'#4A6FA5',
+  pfLine:'#8C9BB5',isaLine:'#2C5F8A',obLine:'#4A7C6F',blLine:'#1C3F7A'
 };
 
 function drawLine(id,rows,keys,cols,dashes){
@@ -691,11 +625,12 @@ function drawLine(id,rows,keys,cols,dashes){
   var mn=Math.min(0,Math.min.apply(null,all)),mx=Math.max.apply(null,all)||1,rng=mx-mn;
   function xp(i){return pd.l+(rows.length>1?i*cW/(rows.length-1):cW/2);}
   function yp(v){return pd.t+cH-(v-mn)/rng*cH;}
-  ctx.strokeStyle='rgba(0,0,0,0.055)';ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='500 9.5px "Source Sans 3",sans-serif';
+  ctx.strokeStyle='rgba(0,0,0,0.055)';
   for(var i=0;i<=4;i++){
     var y=pd.t+cH*i/4;
     ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
-    ctx.fillStyle='rgba(0,0,0,0.38)';ctx.fillText(fmt(mx-rng*i/4),4,y+4);
+    ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='500 9.5px sans-serif';
+    ctx.fillText(fmt(mx-rng*i/4),4,y+4);
   }
   if(mn<0){
     var zy=yp(0);ctx.strokeStyle='rgba(185,28,28,0.25)';ctx.setLineDash([5,3]);
@@ -710,7 +645,7 @@ function drawLine(id,rows,keys,cols,dashes){
     rows.forEach(function(r,ri){if(r[k]==null)return;if(!st){ctx.moveTo(xp(ri),yp(r[k]));st=true;}else ctx.lineTo(xp(ri),yp(r[k]));});
     ctx.stroke();ctx.setLineDash([]);ctx.globalAlpha=1;
   });
-  ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px "Source Sans 3",sans-serif';
+  ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px sans-serif';
   rows.forEach(function(r,ri){if(ri%4===0)ctx.fillText(r.age,xp(ri)-7,H-6);});
 }
 
@@ -725,11 +660,11 @@ function drawBar(id,rows,keys,cols){
   rows.forEach(function(r){var s=0;keys.forEach(function(k){s+=(r[k]||0);});s+=(r.shortfall||0);if(s>mx)mx=s;});
   if(!mx)return;
   var bW=cW/rows.length,gap=0.6;
-  ctx.strokeStyle='rgba(0,0,0,0.055)';ctx.font='9.5px "Source Sans 3",sans-serif';
+  ctx.strokeStyle='rgba(0,0,0,0.055)';
   for(var i=0;i<=4;i++){
     var y=pd.t+cH-(cH*i/4);
     ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
-    ctx.fillStyle='rgba(0,0,0,0.38)';ctx.fillText(fmt(mx*i/4),4,y+4);
+    ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px sans-serif';ctx.fillText(fmt(mx*i/4),4,y+4);
   }
   rows.forEach(function(r,ri){
     var x=pd.l+ri*bW+gap/2,by=pd.t+cH;
@@ -737,11 +672,8 @@ function drawBar(id,rows,keys,cols){
       var v=r[k]||0,bh=v/mx*cH;
       if(bh>0){ctx.fillStyle=cols[ki];ctx.fillRect(x,by-bh,bW-gap,bh);by-=bh;}
     });
-    if(r.shortfall>0){
-      var sh=r.shortfall/mx*cH;
-      ctx.fillStyle='rgba(185,28,28,0.35)';ctx.fillRect(x,by-sh,bW-gap,sh);
-    }
-    if(ri%4===0){ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px "Source Sans 3",sans-serif';ctx.fillText(r.age,pd.l+ri*bW+bW/2-7,H-6);}
+    if(r.shortfall>0){var sh=r.shortfall/mx*cH;ctx.fillStyle='rgba(185,28,28,0.35)';ctx.fillRect(x,by-sh,bW-gap,sh);}
+    if(ri%4===0){ctx.fillStyle='rgba(0,0,0,0.38)';ctx.font='9.5px sans-serif';ctx.fillText(r.age,pd.l+ri*bW+bW/2-7,H-6);}
   });
 }
 
@@ -758,18 +690,13 @@ function calculate(){
   };
   var pf=runStrategy(p,'pension'),if_=runStrategy(p,'isa'),ob_=runStrategy(p,'offshore'),bl=runStrategy(p,'blended');
   var saving=pf.totTax-bl.totTax;
-
   var cmpRows=Array.from({length:p.ty},function(_,i){return{
-    age:p.sa+i,
-    'pf':pf.rows[i]?pf.rows[i].total:0,
+    age:p.sa+i,pf:pf.rows[i]?pf.rows[i].total:0,
     'if':if_.rows[i]?if_.rows[i].total:0,
-    'ob':ob_.rows[i]?ob_.rows[i].total:0,
-    'bl':bl.rows[i]?bl.rows[i].total:0
+    ob:ob_.rows[i]?ob_.rows[i].total:0,
+    bl:bl.rows[i]?bl.rows[i].total:0
   };});
-
   var html='';
-
-  /* Banner */
   html+='<div class="banner">';
   html+='<div style="font-size:22px;flex-shrink:0;margin-top:2px">✓</div><div>';
   html+='<div class="banner-title">Optimal Strategy: Blended Approach</div>';
@@ -781,13 +708,11 @@ function calculate(){
   html+='<br>Tax saving versus pension-first: <strong style="color:var(--royal)">'+ffz(saving)+'</strong>';
   if(bl.totShortfall>0)html+=' &nbsp;·&nbsp; <strong style="color:var(--err)">⚠ Cumulative shortfall: '+ffz(bl.totShortfall)+'</strong>';
   html+='</div></div></div>';
-
-  /* KPI cards */
   var strats=[
-    {lb:'Pension First', sr:pf, top:'#8C9BB5', c:'#8C9BB5'},
-    {lb:'ISA First',     sr:if_, top:C.ob,     c:C.ob},
-    {lb:'Offshore First',sr:ob_, top:C.sage,   c:C.sage},
-    {lb:'Blended ★',    sr:bl,  top:C.pension, c:C.pension},
+    {lb:'Pension First',sr:pf,top:'#8C9BB5',c:'#8C9BB5'},
+    {lb:'ISA First',sr:if_,top:C.ob,c:C.ob},
+    {lb:'Offshore First',sr:ob_,top:C.sage,c:C.sage},
+    {lb:'Blended ★',sr:bl,top:C.pension,c:C.pension}
   ];
   html+='<div class="kpi-grid">';
   strats.forEach(function(s){
@@ -807,8 +732,6 @@ function calculate(){
     html+='</div>';
   });
   html+='</div>';
-
-  /* Line chart */
   html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Total Portfolio Value — All Four Strategies</span>';
   html+='<div class="leg">';
   html+='<span class="leg-item"><span class="leg-dot" style="background:#8C9BB5"></span>Pension First</span>';
@@ -816,8 +739,6 @@ function calculate(){
   html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.sage+'"></span>Offshore First</span>';
   html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.pension+'"></span>Blended</span>';
   html+='</div></div><div class="rpanel-bd"><canvas id="lineChart" style="width:100%;display:block"></canvas></div></div>';
-
-  /* Bar chart */
   html+='<div class="rpanel"><div class="rpanel-hd"><span class="rpanel-title">Annual Income by Source — Blended Strategy</span>';
   html+='<div class="leg">';
   html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.pension+'"></span>Pension</span>';
@@ -829,8 +750,6 @@ function calculate(){
   html+='<span class="leg-item"><span class="leg-dot" style="background:'+C.trust+'"></span>Trust/Other</span>';
   html+='<span class="leg-item"><span class="leg-dot" style="background:rgba(185,28,28,0.45)"></span>Shortfall</span>';
   html+='</div></div><div class="rpanel-bd"><canvas id="barChart" style="width:100%;display:block"></canvas></div></div>';
-
-  /* Table */
   html+='<div class="rpanel"><div class="rpanel-hd">';
   html+='<span class="rpanel-title">Year-by-Year Analysis — Blended Strategy</span>';
   html+='<span style="font-size:11px;color:var(--err);font-weight:600">⚠ Red rows = fund depleted</span>';
@@ -848,7 +767,6 @@ function calculate(){
     html+='<th'+(h.L?' class="L"':'')+' style="'+(h.c?'color:'+h.c:'')+'">' +h.t+'</th>';
   });
   html+='</tr></thead><tbody>';
-
   bl.rows.forEach(function(row){
     var dep=row.depleted;
     var ph1=row.ph===1;
@@ -877,8 +795,6 @@ function calculate(){
     html+='</tr>';
   });
   html+='</tbody></table></div></div>';
-
-  /* Insight */
   html+='<div class="insight">';
   html+='<div style="font-size:16px;flex-shrink:0;margin-top:3px;color:var(--royal)">ℹ</div>';
   html+='<div class="insight-body">';
@@ -887,12 +803,10 @@ function calculate(){
   html+='<strong>Sequencing:</strong> Pension to personal allowance (£12,570 tax-free) → Offshore bond 5% allowance (tax-deferred) → ISA (tax-free) → GIA (CGT only) → Pension top-up (taxed at income tax rate).<br>';
   html+='<strong style="color:var(--err)">After fund depletion</strong> — the model continues every year to age '+(p.sa+p.ty-1)+', showing the precise shortfall. Guaranteed income (state pension, rental, trust) continues regardless of fund balance.';
   html+='</div></div>';
-
   document.getElementById('results').innerHTML=html;
   setTimeout(function(){
     drawLine('lineChart',cmpRows,['pf','if','ob','bl'],
-      [C.pfLine,C.isaLine,C.obLine,C.blLine],
-      [[5,4],[4,3],[3,2],[]]);
+      [C.pfLine,C.isaLine,C.obLine,C.blLine],[[5,4],[4,3],[3,2],[]]);
     drawBar('barChart',bl.rows,
       ['fp','fi','fg','fob','spN','rentalG','trustG'],
       [C.pension,C.isa,C.gia,C.ob,C.sp,C.rental,C.trust]);
